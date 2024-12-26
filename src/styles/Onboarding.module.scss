@@ -1,0 +1,32 @@
+@use "./colors";
+
+.onboarding__container {
+  width: 40%;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 60px;
+
+  .description {
+    span {
+      color: colors.$orange;
+    }
+  }
+
+  button {
+    text-decoration: underline;
+
+    &:hover {
+      text-decoration: none;
+    }
+  }
+}
+
+.footer {
+  color: $grey;
+  font-size: 0.9rem;
+  letter-spacing: 0.1rem;
+  position: absolute;
+  bottom: 24px;
+}

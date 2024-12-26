@@ -1,0 +1,45 @@
+@use "./colors";
+
+.board__container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+  height: 100%;
+  padding: 30px;
+
+  .navbar__container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+
+    .navbar__tabs {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      color: colors.$grey;
+
+      .divider {
+        width: 1px;
+        height: 20px;
+        background-color: colors.$light-grey;
+      }
+
+      .active {
+        color: colors.$black;
+      }
+    }
+
+    .navbar__help {
+      font-family: "Borel", cursive;
+      font-size: 1.6rem;
+    }
+  }
+
+  .content {
+    width: 100%;
+    height: 100%;
+  }
+}

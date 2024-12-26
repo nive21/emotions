@@ -1,7 +1,8 @@
-import Onboarding from "./components/Onboarding";
+import Board from "./components/Board";
+// import { OnboardingIntro } from "./components/Onboarding";
 
 function App() {
-  return <Onboarding />;
+  return <Board />;
 }
 
 export default App;
