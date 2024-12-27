@@ -1,3 +1,6 @@
+import { useEffect, useRef, useState } from "react";
+import p5 from "p5";
+
 import styles from "../styles/Sketchpad.module.scss";
 import clearIcon from "../assets/sketch-icons/clear.svg";
 import deleteIcon from "../assets/sketch-icons/delete.svg";
@@ -8,6 +11,10 @@ import typeIcon from "../assets/sketch-icons/type.svg";
 
 const TOOLS_1: (keyof typeof ICONS)[] = ["Pen", "Crayon", "Type"];
 const TOOLS_2: (keyof typeof ICONS)[] = ["Eraser", "Clear", "Delete"];
+
+const LINE_HEIGHT = 40; // Space between lines
+const TEXT_SIZE = 32; // Font size for text input
+const BLINK_INTERVAL = 500; // Caret blink interval (ms)
 
 const ICONS = {
   Pen: penIcon,
@@ -25,22 +32,32 @@ function Sketchpad({
   onClose: () => void;
   selectedColor: { hue: number; lightness: number };
 }) {
+  const [selectedTool, setSelectedTool] = useState("Pen");
+
   return (
     <div className={styles.sketchpad__container}>
       <button className={styles.sketchpad__close} onClick={onClose}>
         X
       </button>
       <div className={styles.sketchpad__content}>
-        <SketchpadTools tools={TOOLS_1} />
-        <div
-          className={styles.sketchpad__note}
-          style={{
-            backgroundColor: `hsl(${selectedColor.hue}, 100%, ${selectedColor.lightness}%)`,
+        <SketchpadTools
+          {...{
+            tools: TOOLS_1,
+            selectedTool,
+            setSelectedTool,
           }}
-        >
-          <p>Draw here</p>
-        </div>
-        <SketchpadTools tools={TOOLS_2} />
+        />
+        <SketchpadNote
+          color={`hsl(${selectedColor.hue}, 100%, ${selectedColor.lightness}%)`}
+          tool={selectedTool}
+        />
+        <SketchpadTools
+          {...{
+            tools: TOOLS_2,
+            selectedTool,
+            setSelectedTool,
+          }}
+        />
       </div>
     </div>
   );
@@ -48,12 +65,173 @@ function Sketchpad({
 
 export default Sketchpad;
 
-function SketchpadTools({ tools }: { tools: (keyof typeof ICONS)[] }) {
+function SketchpadNote({ color, tool }: { color: string; tool: string }) {
+  const sketchRef = useRef<HTMLDivElement>(null);
+  const toolRef = useRef(tool);
+
+  useEffect(() => {
+    const sketch = (p: p5) => {
+      let textInput = "";
+      //   Caret positions
+      let initialX = -1;
+      let textX = -1;
+      let textY = -1;
+      //   Caret blink
+      let pointerVisible = true;
+      let lastBlinkTime = 0;
+      let numNewLines = 0;
+
+      // Setup function
+      p.setup = () => {
+        p.createCanvas(360, 340).parent(sketchRef.current!);
+        p.background(color);
+      };
+
+      // Handle mouse click for initiating typing
+      p.mousePressed = () => {
+        if (toolRef.current === "Type") {
+          p.strokeWeight(1);
+          textX = p.mouseX;
+          initialX = textX;
+          textY = p.mouseY;
+          textInput = "";
+          pointerVisible = true;
+          numNewLines = 0;
+        }
+      };
+
+      p.keyPressed = () => {
+        if (toolRef.current === "Type") {
+          if (p.keyCode === p.BACKSPACE) {
+            if (textInput.endsWith("\n")) {
+              textInput = textInput.slice(0, -1); // Remove the newline character
+              numNewLines--;
+            } else if (textInput === "") {
+              if (numNewLines > 0) {
+                numNewLines--;
+              }
+            } else {
+              // Remove the last character
+              textInput = textInput.slice(0, -1);
+            }
+          } else if (p.keyCode === p.ENTER) {
+            textInput += "\n";
+            textX = initialX; // Move to initial X position
+            numNewLines++;
+          } else if (p.key.length === 1) {
+            textInput += p.key;
+          }
+        }
+      };
+
+      // Draw the canvas
+      p.draw = () => {
+        if (toolRef.current === "Clear") {
+          p.clear();
+          p.background(color);
+          return;
+        }
+
+        // Handle drawing tools
+        if (p.mouseIsPressed) {
+          handleDrawing(p);
+        }
+
+        // Handle text input
+        if (toolRef.current === "Type" && textX !== -1 && textY !== -1) {
+          renderTextAndCaret(p);
+        }
+      };
+
+      // Drawing tools logic
+      const handleDrawing = (p: p5) => {
+        if (toolRef.current === "Pen") {
+          p.noErase();
+          p.stroke(0);
+          p.strokeWeight(2);
+          p.line(p.pmouseX, p.pmouseY, p.mouseX, p.mouseY);
+        } else if (toolRef.current === "Eraser") {
+          p.erase();
+          p.stroke(color);
+          p.strokeWeight(6);
+          p.line(p.pmouseX, p.pmouseY, p.mouseX, p.mouseY);
+          p.noErase();
+        } else if (toolRef.current === "Crayon") {
+          p.noErase();
+          p.stroke(0);
+          p.strokeWeight(p.random(8, 10));
+          p.line(p.pmouseX, p.pmouseY, p.mouseX, p.mouseY);
+        }
+      };
+
+      // Render text and caret
+      const renderTextAndCaret = (p: p5) => {
+        p.background(color); // Clear the canvas
+        p.fill(0); // Set text color
+        p.textSize(TEXT_SIZE);
+        p.textFont("Borel");
+
+        // Draw the text input
+        p.text(textInput, textX, textY);
+
+        // Toggle caret visibility
+        const currentTime = p.millis();
+        if (currentTime - lastBlinkTime > BLINK_INTERVAL) {
+          pointerVisible = !pointerVisible;
+          lastBlinkTime = currentTime;
+        }
+
+        // Draw caret if visible
+        if (pointerVisible) {
+          const caretX = calculateCaretX();
+          const caretY = textY + numNewLines * LINE_HEIGHT;
+          p.stroke(0); // Caret color. TODO: Allow change
+          p.line(caretX, caretY - 20, caretX, caretY + 10);
+        }
+      };
+
+      // Calculate caret position
+      const calculateCaretX = () => {
+        const lastNewlineIndex = textInput.lastIndexOf("\n");
+        const visibleText =
+          lastNewlineIndex === -1
+            ? textInput
+            : textInput.slice(lastNewlineIndex + 1);
+        return textX + p.textWidth(visibleText);
+      };
+    };
+
+    const p5Instance = new p5(sketch);
+
+    return () => {
+      p5Instance.remove();
+    };
+  }, [color]);
+
+  useEffect(() => {
+    toolRef.current = tool;
+  }, [tool]);
+
+  return <div ref={sketchRef} className={styles.sketchpad__note}></div>;
+}
+
+function SketchpadTools({
+  tools,
+  selectedTool,
+  setSelectedTool,
+}: {
+  tools: (keyof typeof ICONS)[];
+  selectedTool: string;
+  setSelectedTool: (tool: string) => void;
+}) {
   return (
     <div className={styles.sketchpad__tools}>
       {tools.map((tool, i) => (
         <div key={i}>
-          <button>
+          <button
+            onClick={() => setSelectedTool(tool)}
+            className={selectedTool === tool ? styles.active : ""}
+          >
             <img src={ICONS[tool]} alt={tool} />
           </button>
           {tool}
