@@ -26,6 +26,7 @@
   .sketchpad__content {
     display: flex;
     gap: 42px;
+    height: 340px;
 
     .sketchpad__tools {
       display: flex;
@@ -69,8 +70,12 @@
     }
 
     .sketchpad__note {
-      canvas {
+      position: relative;
+      width: 360px;
+
+      canvas:first-child {
         box-shadow: -6px 6px rgba(0, 0, 0, 0.2);
+        position: absolute;
       }
     }
   }
