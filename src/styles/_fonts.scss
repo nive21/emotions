@@ -1,0 +1,9 @@
+@use "./colors";
+
+%base-text {
+  all: unset;
+  text-transform: uppercase;
+  letter-spacing: 0.1rem;
+  color: colors.$grey;
+  font-size: 0.9rem;
+}
