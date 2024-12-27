@@ -1,28 +1,7 @@
 import styles from "../styles/Onboarding.module.scss";
 
-// The onboarding screen template
-function Onboarding({
-  description,
-  buttonText,
-}: {
-  description: JSX.Element;
-  buttonText: string;
-}) {
-  return (
-    <>
-      <div className={styles.onboarding__container}>
-        <h1 className={styles.description}>{description}</h1>
-        <button>{buttonText}</button>
-      </div>
-      <p className={styles.footer}>
-        Made with ♡ by <a href="https://www.linkedin.com/in/nivemathan/">NK</a>
-      </p>
-    </>
-  );
-}
-
 // The introduction onboarding screen
-export function OnboardingIntro() {
+export function OnboardingIntro({ onClick }: { onClick: () => void }) {
   return (
     <Onboarding
       description={
@@ -32,12 +11,13 @@ export function OnboardingIntro() {
         </p>
       }
       buttonText="Okay"
+      onClick={onClick}
     />
   );
 }
 
 // The second onboarding screen explaining the concept of the app
-export function OnboardingOutro() {
+export function OnboardingOutro({ onClick }: { onClick: () => void }) {
   return (
     <Onboarding
       description={
@@ -50,6 +30,30 @@ export function OnboardingOutro() {
         </p>
       }
       buttonText="Get started"
+      onClick={onClick}
     />
+  );
+}
+
+// The onboarding screen template
+function Onboarding({
+  description,
+  buttonText,
+  onClick,
+}: {
+  description: JSX.Element;
+  buttonText: string;
+  onClick?: () => void;
+}) {
+  return (
+    <>
+      <div className={styles.onboarding__container}>
+        <h1 className={styles.description}>{description}</h1>
+        <button onClick={onClick}>{buttonText}</button>
+      </div>
+      <p className={styles.footer}>
+        Made with ♡ by <a href="https://www.linkedin.com/in/nivemathan/">NK</a>
+      </p>
+    </>
   );
 }

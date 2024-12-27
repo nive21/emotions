@@ -4,12 +4,12 @@ import Supplies from "./Supplies";
 import CalendarBoard from "./CalendarBoard";
 
 // The board of emotions
-function Board() {
+function Board({ onClick }: { onClick: () => void }) {
   const [tab, setTab] = useState(0);
 
   return (
     <div className={styles.board__container}>
-      <Navbar {...{ tab, setTab }} />
+      <Navbar {...{ tab, setTab, onClick }} />
       <div className={styles.content}>
         {tab === 0 ? <Supplies /> : <CalendarBoard />}
       </div>
@@ -23,9 +23,11 @@ export default Board;
 function Navbar({
   tab,
   setTab,
+  onClick,
 }: {
   tab: number;
   setTab: (tab: number) => void;
+  onClick: () => void;
 }) {
   const handleClick = (tab: number) => {
     setTab(tab);
@@ -50,7 +52,7 @@ function Navbar({
         </button>
       </div>
       <div className={styles.navbar__help}>
-        <button>?</button>
+        <button onClick={onClick}>?</button>
       </div>
     </div>
   );
