@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import p5 from "p5";
 
 import styles from "../styles/Sketchpad.module.scss";
@@ -40,13 +40,22 @@ function Sketchpad({
   timestamp: number;
 }) {
   const [selectedTool, setSelectedTool] = useState<ToolsType>("Pen");
+  const [save, setSave] = useState(false);
 
   const notes: NotesType = JSON.parse(localStorage.getItem("notes") || "{}");
   const date = new Date(timestamp).toLocaleDateString();
 
   return (
     <div className={styles.sketchpad__container}>
-      <button className={styles.sketchpad__close} onClick={onClose}>
+      <button
+        className={styles.sketchpad__close}
+        onClick={() => {
+          setSave(true);
+          setTimeout(() => {
+            onClose();
+          }, 20);
+        }}
+      >
         X
       </button>
       {selectedTool === "Delete" && (
@@ -73,7 +82,7 @@ function Sketchpad({
           color={selectedColor}
           tool={selectedTool}
           timestamp={timestamp}
-          notes={notes}
+          save={save}
         />
         <SketchpadTools
           {...{
@@ -124,17 +133,85 @@ function SketchpadNote({
   color,
   tool,
   timestamp,
-  notes,
+  save,
 }: {
   color: string;
   tool: string;
   timestamp: number;
-  notes: NotesType;
+  save: boolean;
 }) {
+  const notes: NotesType = JSON.parse(localStorage.getItem("notes") || "{}");
+  const date = new Date(timestamp).toLocaleDateString();
+
   const sketchRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLDivElement>(null);
   const toolRef = useRef(tool);
-  const date = new Date(timestamp).toLocaleDateString();
+  const notesRef = useRef(notes);
+
+  const handleSave = useCallback(
+    (toDownload: boolean) => {
+      const sketchCanvas = sketchRef.current?.querySelector("canvas");
+      const textCanvas = textRef.current?.querySelector("canvas");
+
+      if (sketchCanvas && textCanvas) {
+        // Create an offscreen canvas to combine both canvases
+        const combinedCanvas = document.createElement("canvas");
+        combinedCanvas.width = CANVAS_WIDTH;
+        combinedCanvas.height = CANVAS_HEIGHT;
+
+        const context = combinedCanvas.getContext("2d");
+        if (context) {
+          // Draw the canvases
+          context.drawImage(textCanvas, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+          context.drawImage(sketchCanvas, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+          if (toDownload) {
+            // Create a link element to save the image
+            const link = document.createElement("a");
+
+            // Format the date for the filename
+            const formattedDate = new Date(timestamp)
+              .toLocaleString("en-US", {
+                day: "2-digit",
+                month: "short",
+                hour: "numeric",
+                hour12: true,
+              })
+              .replace(", ", "-");
+            link.download = `note-${formattedDate}.png`;
+            link.href = combinedCanvas.toDataURL("image/png");
+
+            // Trigger the download
+            link.click();
+          } else {
+            // Save the image to localStorage if save was clicked
+            const imageData = combinedCanvas.toDataURL("image/png");
+            const note = {
+              sketch: imageData,
+              color,
+            };
+
+            if (!notes[date]) notes[date] = {};
+            notes[date][timestamp] = note;
+            localStorage.setItem("notes", JSON.stringify(notes));
+          }
+        }
+      }
+    },
+    [color, date, notes, timestamp]
+  );
+
+  useEffect(() => {
+    toolRef.current = tool;
+  }, [tool]);
+
+  useEffect(() => {
+    notesRef.current = notes;
+  }, [notes]);
+
+  if (toolRef.current === "Download") {
+    handleSave(true);
+  }
 
   useEffect(() => {
     let textOptions: TextOption[] = [];
@@ -186,10 +263,12 @@ function SketchpadNote({
         p.createCanvas(360, 340).parent(textRef.current!);
         p.background(color);
 
+        const currentNotes = notesRef.current;
+
         // Load the stored image if it exists
-        if (notes?.[date]?.[timestamp]) {
+        if (currentNotes?.[date]?.[timestamp]) {
           storedImage = p.loadImage(
-            notes[date][timestamp].sketch,
+            currentNotes[date][timestamp].sketch,
             () => {
               console.log("Image loaded");
             },
@@ -262,6 +341,7 @@ function SketchpadNote({
           p.clear();
           p.background(color);
           textOptions = [];
+          storedImage = null;
           return;
         }
 
@@ -333,76 +413,27 @@ function SketchpadNote({
       p5Instance.remove();
       p5Instance2.remove();
     };
-  }, [color, date, notes, timestamp]);
+  }, [color, date, timestamp]);
 
   useEffect(() => {
-    toolRef.current = tool;
-  }, [tool]);
-
-  const handleSave = (toDownload: boolean) => {
-    const sketchCanvas = sketchRef.current?.querySelector("canvas");
-    const textCanvas = textRef.current?.querySelector("canvas");
-
-    if (sketchCanvas && textCanvas) {
-      // Create an offscreen canvas to combine both canvases
-      const combinedCanvas = document.createElement("canvas");
-      combinedCanvas.width = CANVAS_WIDTH;
-      combinedCanvas.height = CANVAS_HEIGHT;
-
-      const context = combinedCanvas.getContext("2d");
-      if (context) {
-        // Draw the canvases
-        context.drawImage(textCanvas, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-        context.drawImage(sketchCanvas, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-
-        if (toDownload) {
-          // Create a link element to save the image
-          const link = document.createElement("a");
-
-          // Format the date for the filename
-          const formattedDate = new Date(timestamp)
-            .toLocaleString("en-US", {
-              day: "2-digit",
-              month: "short",
-              hour: "numeric",
-              hour12: true,
-            })
-            .replace(", ", "-");
-          link.download = `note-${formattedDate}.png`;
-          link.href = combinedCanvas.toDataURL("image/png");
-
-          // Trigger the download
-          link.click();
-        } else {
-          // Save the image to localStorage if save was clicked
-          const imageData = combinedCanvas.toDataURL("image/png");
-          const note = {
-            sketch: imageData,
-            color,
-          };
-
-          if (!notes[date]) notes[date] = {};
-          notes[date][timestamp] = note;
-          localStorage.setItem("notes", JSON.stringify(notes));
-        }
-      }
+    if (save) {
+      handleSave(false);
     }
-  };
+  }, [save, handleSave]);
 
-  if (toolRef.current === "Download") {
-    handleSave(true);
-  }
+  // Save the note every 30 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      handleSave(false);
+    }, 30000);
+
+    return () => clearInterval(interval);
+  }, [handleSave]);
 
   return (
     <div className={styles.sketchpad__note}>
       <div ref={textRef} className={styles.text}></div>
       <div ref={sketchRef} className={styles.sketch}></div>
-      <button
-        className={styles.sketchpad__save}
-        onClick={() => handleSave(false)}
-      >
-        Save
-      </button>
     </div>
   );
 }
