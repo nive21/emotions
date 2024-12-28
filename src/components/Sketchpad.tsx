@@ -8,6 +8,7 @@ import penIcon from "../assets/sketch-icons/pen.svg";
 import crayonIcon from "../assets/sketch-icons/crayon.svg";
 import typeIcon from "../assets/sketch-icons/type.svg";
 import downloadIcon from "../assets/sketch-icons/download.svg";
+import { NotesType } from "./CalendarBoard";
 
 type ToolsType = keyof typeof ICONS;
 
@@ -32,11 +33,16 @@ const ICONS = {
 function Sketchpad({
   onClose,
   selectedColor,
+  timestamp,
 }: {
   onClose: () => void;
   selectedColor: string;
+  timestamp: number;
 }) {
   const [selectedTool, setSelectedTool] = useState<ToolsType>("Pen");
+
+  const notes: NotesType = JSON.parse(localStorage.getItem("notes") || "{}");
+  const date = new Date(timestamp).toLocaleDateString();
 
   return (
     <div className={styles.sketchpad__container}>
@@ -46,8 +52,9 @@ function Sketchpad({
       {selectedTool === "Delete" && (
         <DeleteConfirmation
           onDelete={(toDelete: boolean) => {
-            if (toDelete) {
-              localStorage.removeItem("notes");
+            if (toDelete && notes?.[date]?.[timestamp]) {
+              delete notes[date][timestamp];
+              localStorage.setItem("notes", JSON.stringify(notes));
               onClose();
             }
             setSelectedTool("Pen");
@@ -62,7 +69,12 @@ function Sketchpad({
             setSelectedTool,
           }}
         />
-        <SketchpadNote color={selectedColor} tool={selectedTool} />
+        <SketchpadNote
+          color={selectedColor}
+          tool={selectedTool}
+          timestamp={timestamp}
+          notes={notes}
+        />
         <SketchpadTools
           {...{
             tools: TOOLS_2,
@@ -108,13 +120,25 @@ type TextOption = {
   lastBlinkTime: number;
 };
 
-function SketchpadNote({ color, tool }: { color: string; tool: string }) {
+function SketchpadNote({
+  color,
+  tool,
+  timestamp,
+  notes,
+}: {
+  color: string;
+  tool: string;
+  timestamp: number;
+  notes: NotesType;
+}) {
   const sketchRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLDivElement>(null);
   const toolRef = useRef(tool);
+  const date = new Date(timestamp).toLocaleDateString();
 
   useEffect(() => {
     let textOptions: TextOption[] = [];
+    let storedImage: p5.Image | null = null;
 
     // The top layer for ink/crayon
     // Has no background color
@@ -161,6 +185,19 @@ function SketchpadNote({ color, tool }: { color: string; tool: string }) {
       p.setup = () => {
         p.createCanvas(360, 340).parent(textRef.current!);
         p.background(color);
+
+        // Load the stored image if it exists
+        if (notes?.[date]?.[timestamp]) {
+          storedImage = p.loadImage(
+            notes[date][timestamp].sketch,
+            () => {
+              console.log("Image loaded");
+            },
+            (error) => {
+              console.error("Error loading image", error);
+            }
+          );
+        }
       };
 
       // Handle mouse click for initiating typing
@@ -216,6 +253,11 @@ function SketchpadNote({ color, tool }: { color: string; tool: string }) {
 
       // Draw the canvas
       p.draw = () => {
+        if (storedImage) {
+          // Draw the stored image
+          p.image(storedImage, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+        }
+
         if (toolRef.current === "Clear") {
           p.clear();
           p.background(color);
@@ -291,14 +333,10 @@ function SketchpadNote({ color, tool }: { color: string; tool: string }) {
       p5Instance.remove();
       p5Instance2.remove();
     };
-  }, [color]);
+  }, [color, date, notes, timestamp]);
 
   useEffect(() => {
     toolRef.current = tool;
-
-    if (tool === "Download") {
-      handleSave(true);
-    }
   }, [tool]);
 
   const handleSave = (toDownload: boolean) => {
@@ -314,15 +352,15 @@ function SketchpadNote({ color, tool }: { color: string; tool: string }) {
       const context = combinedCanvas.getContext("2d");
       if (context) {
         // Draw the canvases
-        context.drawImage(textCanvas, 0, 0);
-        context.drawImage(sketchCanvas, 0, 0);
+        context.drawImage(textCanvas, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+        context.drawImage(sketchCanvas, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
         if (toDownload) {
           // Create a link element to save the image
           const link = document.createElement("a");
 
           // Format the date for the filename
-          const formattedDate = new Date(Date.now())
+          const formattedDate = new Date(timestamp)
             .toLocaleString("en-US", {
               day: "2-digit",
               month: "short",
@@ -338,25 +376,22 @@ function SketchpadNote({ color, tool }: { color: string; tool: string }) {
         } else {
           // Save the image to localStorage if save was clicked
           const imageData = combinedCanvas.toDataURL("image/png");
-          const date = new Date(Date.now()).toLocaleDateString();
-
-          const notes = JSON.parse(localStorage.getItem("notes") || "{}");
           const note = {
-            timestamp: Date.now(),
             sketch: imageData,
             color,
           };
 
-          if (notes[date]) {
-            notes[date] = [...notes[date], note];
-          } else {
-            notes[date] = [note];
-          }
+          if (!notes[date]) notes[date] = {};
+          notes[date][timestamp] = note;
           localStorage.setItem("notes", JSON.stringify(notes));
         }
       }
     }
   };
+
+  if (toolRef.current === "Download") {
+    handleSave(true);
+  }
 
   return (
     <div className={styles.sketchpad__note}>

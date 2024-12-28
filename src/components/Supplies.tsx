@@ -30,7 +30,11 @@ function Supplies({
   return (
     <>
       {editMode && (
-        <Sketchpad onClose={handleClose} selectedColor={selectedColor} />
+        <Sketchpad
+          onClose={handleClose}
+          selectedColor={selectedColor}
+          timestamp={Date.now()}
+        />
       )}
       <ColorsTab {...{ tab, setTab }} />
       <AllNotes {...{ tab, onEdit: handleEdit }} />
