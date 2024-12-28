@@ -78,5 +78,22 @@
         position: absolute;
       }
     }
+
+    .sketchpad__save {
+      @extend %base-text;
+      position: relative;
+      left: 290px;
+      top: 300px;
+      cursor: pointer;
+      color: colors.$black;
+      background-color: colors.$cream;
+      padding: 4px 8px;
+      border-radius: 2px;
+
+      &:hover {
+        color: #000000;
+        background-color: colors.$white;
+      }
+    }
   }
 }

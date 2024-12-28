@@ -27,6 +27,7 @@ function App() {
   // If help button is clicked, show the intro
   const handleHelpClick = () => {
     setIsFirstTime(true);
+    setNextClicked(false);
   };
 
   return (

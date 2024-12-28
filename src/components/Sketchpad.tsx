@@ -4,23 +4,27 @@ import p5 from "p5";
 import styles from "../styles/Sketchpad.module.scss";
 import clearIcon from "../assets/sketch-icons/clear.svg";
 import deleteIcon from "../assets/sketch-icons/delete.svg";
-import eraserIcon from "../assets/sketch-icons/eraser.svg";
 import penIcon from "../assets/sketch-icons/pen.svg";
 import crayonIcon from "../assets/sketch-icons/crayon.svg";
 import typeIcon from "../assets/sketch-icons/type.svg";
+import downloadIcon from "../assets/sketch-icons/download.svg";
 
-const TOOLS_1: (keyof typeof ICONS)[] = ["Pen", "Crayon", "Type"];
-const TOOLS_2: (keyof typeof ICONS)[] = ["Eraser", "Clear", "Delete"];
+type ToolsType = keyof typeof ICONS;
+
+const TOOLS_1: ToolsType[] = ["Pen", "Crayon", "Type"];
+const TOOLS_2: ToolsType[] = ["Download", "Clear", "Delete"];
 
 const LINE_HEIGHT = 40; // Space between lines
 const TEXT_SIZE = 32; // Font size for text input
 const BLINK_INTERVAL = 500; // Caret blink interval (ms)
+const CANVAS_WIDTH = 360;
+const CANVAS_HEIGHT = 340;
 
 const ICONS = {
   Pen: penIcon,
   Crayon: crayonIcon,
   Type: typeIcon,
-  Eraser: eraserIcon,
+  Download: downloadIcon,
   Clear: clearIcon,
   Delete: deleteIcon,
 };
@@ -32,7 +36,7 @@ function Sketchpad({
   onClose: () => void;
   selectedColor: { hue: number; lightness: number };
 }) {
-  const [selectedTool, setSelectedTool] = useState("Pen");
+  const [selectedTool, setSelectedTool] = useState<ToolsType>("Pen");
 
   return (
     <div className={styles.sketchpad__container}>
@@ -88,7 +92,7 @@ function SketchpadNote({ color, tool }: { color: string; tool: string }) {
     const sketch = (p: p5) => {
       // Setup function
       p.setup = () => {
-        p.createCanvas(360, 340).parent(sketchRef.current!);
+        p.createCanvas(CANVAS_WIDTH, CANVAS_HEIGHT).parent(sketchRef.current!);
       };
 
       // Draw the canvas
@@ -111,11 +115,6 @@ function SketchpadNote({ color, tool }: { color: string; tool: string }) {
           p.noErase();
           p.stroke(0);
           p.strokeWeight(2);
-          p.line(p.pmouseX, p.pmouseY, p.mouseX, p.mouseY);
-        } else if (toolRef.current === "Eraser") {
-          p.erase();
-          p.strokeWeight(0);
-          p.strokeWeight(6);
           p.line(p.pmouseX, p.pmouseY, p.mouseX, p.mouseY);
         } else if (toolRef.current === "Crayon") {
           p.noErase();
@@ -188,6 +187,13 @@ function SketchpadNote({ color, tool }: { color: string; tool: string }) {
 
       // Draw the canvas
       p.draw = () => {
+        if (toolRef.current === "Clear") {
+          p.clear();
+          p.background(color);
+          textOptions = [];
+          return;
+        }
+
         // Handle text input
         if (textOptions.length) {
           p.background(color); // Clear the canvas
@@ -260,13 +266,68 @@ function SketchpadNote({ color, tool }: { color: string; tool: string }) {
 
   useEffect(() => {
     toolRef.current = tool;
+
+    if (tool === "Download") {
+      handleSave(true);
+    }
   }, [tool]);
 
+  const handleSave = (toDownload: boolean) => {
+    const sketchCanvas = sketchRef.current?.querySelector("canvas");
+    const textCanvas = textRef.current?.querySelector("canvas");
+
+    if (sketchCanvas && textCanvas) {
+      // Create an offscreen canvas to combine both canvases
+      const combinedCanvas = document.createElement("canvas");
+      combinedCanvas.width = CANVAS_WIDTH;
+      combinedCanvas.height = CANVAS_HEIGHT;
+
+      const context = combinedCanvas.getContext("2d");
+      if (context) {
+        // Draw the canvases
+        context.drawImage(textCanvas, 0, 0);
+        context.drawImage(sketchCanvas, 0, 0);
+
+        if (toDownload) {
+          // Create a link element to save the image
+          const link = document.createElement("a");
+
+          // Format the date for the filename
+          const formattedDate = new Date(Date.now())
+            .toLocaleString("en-US", {
+              day: "2-digit",
+              month: "short",
+              hour: "numeric",
+              hour12: true,
+            })
+            .replace(", ", "-");
+          link.download = `note-${formattedDate}.png`;
+          link.href = combinedCanvas.toDataURL("image/png");
+
+          // Trigger the download
+          link.click();
+        } else {
+          // Save the image to localStorage if save was clicked
+          const imageData = combinedCanvas.toDataURL("image/png");
+          localStorage.setItem("savedCanvasImage", imageData);
+        }
+      }
+    }
+  };
+
   return (
-    <div className={styles.sketchpad__note}>
-      <div ref={textRef} className={styles.text}></div>
-      <div ref={sketchRef} className={styles.sketch}></div>
-    </div>
+    <>
+      <div className={styles.sketchpad__note}>
+        <div ref={textRef} className={styles.text}></div>
+        <div ref={sketchRef} className={styles.sketch}></div>
+        <button
+          className={styles.sketchpad__save}
+          onClick={() => handleSave(false)}
+        >
+          Save
+        </button>
+      </div>
+    </>
   );
 }
 
@@ -276,15 +337,26 @@ function SketchpadTools({
   setSelectedTool,
 }: {
   tools: (keyof typeof ICONS)[];
-  selectedTool: string;
-  setSelectedTool: (tool: string) => void;
+  selectedTool: ToolsType;
+  setSelectedTool: (tool: ToolsType) => void;
 }) {
   return (
     <div className={styles.sketchpad__tools}>
       {tools.map((tool, i) => (
         <div key={i}>
           <button
-            onClick={() => setSelectedTool(tool)}
+            onClick={() => {
+              const prevTool: keyof typeof ICONS = selectedTool;
+
+              if (tool === "Clear" || tool === "Download") {
+                setSelectedTool(tool);
+                setTimeout(() => {
+                  setSelectedTool(prevTool);
+                }, 200);
+              } else {
+                setSelectedTool(tool);
+              }
+            }}
             className={selectedTool === tool ? styles.active : ""}
           >
             <img src={ICONS[tool]} alt={tool} />
