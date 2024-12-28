@@ -6,12 +6,29 @@ import CalendarBoard from "./CalendarBoard";
 // The board of emotions
 function Board({ onClick }: { onClick: () => void }) {
   const [tab, setTab] = useState(0);
+  const [editMode, setEditMode] = useState(false);
+  const [selectedColor, setSelectedColor] = useState("");
+
+  const handleEdit = (color: string) => {
+    setSelectedColor(color);
+    setEditMode(true);
+  };
+
+  const handleClose = () => {
+    setEditMode(false);
+  };
 
   return (
     <div className={styles.board__container}>
       <Navbar {...{ tab, setTab, onClick }} />
       <div className={styles.content}>
-        {tab === 0 ? <Supplies /> : <CalendarBoard />}
+        {tab === 0 ? (
+          <Supplies {...{ editMode, selectedColor, handleEdit, handleClose }} />
+        ) : (
+          <CalendarBoard
+            {...{ editMode, selectedColor, handleEdit, handleClose }}
+          />
+        )}
       </div>
     </div>
   );

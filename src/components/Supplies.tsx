@@ -11,20 +11,21 @@ const COLORS = [
 const COL = 5;
 const ROW = 10;
 
+export type EditHandler = (color: string) => void;
+
 // The supplies tab of the board
-function Supplies() {
+function Supplies({
+  editMode,
+  selectedColor,
+  handleEdit,
+  handleClose,
+}: {
+  editMode: boolean;
+  selectedColor: string;
+  handleEdit: EditHandler;
+  handleClose: () => void;
+}) {
   const [tab, setTab] = useState(0);
-  const [editMode, setEditMode] = useState(false);
-  const [selectedColor, setSelectedColor] = useState({ hue: 0, lightness: 0 });
-
-  const handleEdit = (hue: number, lightness: number) => {
-    setSelectedColor({ hue, lightness });
-    setEditMode(true);
-  };
-
-  const handleClose = () => {
-    setEditMode(false);
-  };
 
   return (
     <>
@@ -63,8 +64,6 @@ function ColorsTab({
   );
 }
 
-type EditHandler = (hue: number, lightness: number) => void;
-
 function AllNotes({ tab, onEdit }: { tab: number; onEdit: EditHandler }) {
   return (
     <div className={styles.supplies__container}>
@@ -99,13 +98,14 @@ function EmptyNote({
   hue: number;
   onEdit: EditHandler;
 }) {
+  const color = `hsl(${hue}, 74%, ${lightness}%)`;
   return (
     <div
       className={styles.note}
       style={{
-        backgroundColor: `hsl(${hue}, 74%, ${lightness}%)`,
+        backgroundColor: color,
       }}
-      onClick={() => onEdit(hue, lightness)}
+      onClick={() => onEdit(color)}
     ></div>
   );
 }

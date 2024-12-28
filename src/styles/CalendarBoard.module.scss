@@ -3,3 +3,16 @@
   height: 100%;
   padding: 20px;
 }
+
+.note__indicators {
+  position: relative;
+  width: 100%;
+  left: 30px;
+  top: 6px;
+
+  svg {
+    position: absolute;
+    width: 20px;
+    cursor: pointer;
+  }
+}

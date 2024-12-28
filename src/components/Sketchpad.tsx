@@ -34,7 +34,7 @@ function Sketchpad({
   selectedColor,
 }: {
   onClose: () => void;
-  selectedColor: { hue: number; lightness: number };
+  selectedColor: string;
 }) {
   const [selectedTool, setSelectedTool] = useState<ToolsType>("Pen");
 
@@ -43,6 +43,17 @@ function Sketchpad({
       <button className={styles.sketchpad__close} onClick={onClose}>
         X
       </button>
+      {selectedTool === "Delete" && (
+        <DeleteConfirmation
+          onDelete={(toDelete: boolean) => {
+            if (toDelete) {
+              localStorage.removeItem("notes");
+              onClose();
+            }
+            setSelectedTool("Pen");
+          }}
+        />
+      )}
       <div className={styles.sketchpad__content}>
         <SketchpadTools
           {...{
@@ -51,10 +62,7 @@ function Sketchpad({
             setSelectedTool,
           }}
         />
-        <SketchpadNote
-          color={`hsl(${selectedColor.hue}, 100%, ${selectedColor.lightness}%)`}
-          tool={selectedTool}
-        />
+        <SketchpadNote color={selectedColor} tool={selectedTool} />
         <SketchpadTools
           {...{
             tools: TOOLS_2,
@@ -68,6 +76,27 @@ function Sketchpad({
 }
 
 export default Sketchpad;
+
+// Delete confirmation modal
+function DeleteConfirmation({
+  onDelete,
+}: {
+  onDelete: (toDelete: boolean) => void;
+}) {
+  return (
+    <>
+      <div className={styles.delete__confirmation}>
+        <h2>Are you sure?</h2>
+        <p>Are you sure you want to delete this note?</p>
+        <div className={styles.delete__buttons}>
+          <button onClick={() => onDelete(true)}>Delete</button>
+          <button onClick={() => onDelete(false)}>Cancel</button>
+        </div>
+      </div>
+      <div className={styles.delete__overlay}></div>
+    </>
+  );
+}
 
 type TextOption = {
   textX: number;
@@ -309,25 +338,37 @@ function SketchpadNote({ color, tool }: { color: string; tool: string }) {
         } else {
           // Save the image to localStorage if save was clicked
           const imageData = combinedCanvas.toDataURL("image/png");
-          localStorage.setItem("savedCanvasImage", imageData);
+          const date = new Date(Date.now()).toLocaleDateString();
+
+          const notes = JSON.parse(localStorage.getItem("notes") || "{}");
+          const note = {
+            timestamp: Date.now(),
+            sketch: imageData,
+            color,
+          };
+
+          if (notes[date]) {
+            notes[date] = [...notes[date], note];
+          } else {
+            notes[date] = [note];
+          }
+          localStorage.setItem("notes", JSON.stringify(notes));
         }
       }
     }
   };
 
   return (
-    <>
-      <div className={styles.sketchpad__note}>
-        <div ref={textRef} className={styles.text}></div>
-        <div ref={sketchRef} className={styles.sketch}></div>
-        <button
-          className={styles.sketchpad__save}
-          onClick={() => handleSave(false)}
-        >
-          Save
-        </button>
-      </div>
-    </>
+    <div className={styles.sketchpad__note}>
+      <div ref={textRef} className={styles.text}></div>
+      <div ref={sketchRef} className={styles.sketch}></div>
+      <button
+        className={styles.sketchpad__save}
+        onClick={() => handleSave(false)}
+      >
+        Save
+      </button>
+    </div>
   );
 }
 
