@@ -26,15 +26,19 @@ function SketchpadNote({
   tool,
   timestamp,
   save,
+  onClose,
 }: {
   emotion: string;
   color: string;
   tool: string;
   timestamp: number;
   save: boolean;
+  onClose: () => void;
 }) {
   const notes: NotesType = JSON.parse(localStorage.getItem("notes") || "{}");
   const date = new Date(timestamp).toLocaleDateString();
+  //   If emotion is not available in localStorage, use the emotion prop
+  const pickedEmotion = notes[date]?.[timestamp]?.emotion || emotion;
 
   const sketchRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLDivElement>(null);
@@ -79,19 +83,20 @@ function SketchpadNote({
           } else {
             // Save the image to localStorage if save was clicked
             const imageData = combinedCanvas.toDataURL("image/png");
-            const note = {
+            if (!notes[date]) notes[date] = {};
+
+            // Update the notes object
+            notes[date][timestamp] = {
               sketch: imageData,
+              emotion: pickedEmotion,
               color,
             };
-
-            if (!notes[date]) notes[date] = {};
-            notes[date][timestamp] = note;
             localStorage.setItem("notes", JSON.stringify(notes));
           }
         }
       }
     },
-    [color, date, notes, timestamp]
+    [timestamp, notes, date, pickedEmotion, color]
   );
 
   useEffect(() => {
@@ -259,7 +264,7 @@ function SketchpadNote({
 
       // Render the emotion text
       const renderEmotion = (p: p5) => {
-        const text = `I feel\n${emotion.toLowerCase()}`;
+        const text = `I feel\n${pickedEmotion.toLowerCase()}`;
         console.log(text);
         p.textAlign(p.CENTER);
         p.text(text, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2);
@@ -319,7 +324,7 @@ function SketchpadNote({
       p5Instance.remove();
       p5Instance2.remove();
     };
-  }, [color, date, timestamp, emotion]);
+  }, [color, date, timestamp, pickedEmotion]);
 
   useEffect(() => {
     if (save) {
@@ -340,6 +345,15 @@ function SketchpadNote({
     <div className={styles.sketchpad__note}>
       <div ref={textRef} className={styles.text}></div>
       <div ref={sketchRef} className={styles.sketch}></div>
+      <button
+        className={styles.save}
+        onClick={() => {
+          handleSave(false);
+          onClose();
+        }}
+      >
+        Save & Close
+      </button>
     </div>
   );
 }

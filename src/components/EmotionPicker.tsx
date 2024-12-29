@@ -24,7 +24,7 @@ function EmotionPicker({
   // TODO: Currenly pannable is not used. Decide if you want a pannable pick area
   return (
     <div className={styles.emotion__container}>
-      <h2>How are you feeling?</h2>
+      <h2 className={styles.title}>How are you feeling?</h2>
       <Pannable>
         <div className={styles.emotion__list}>
           {Object.keys(EMOTIONS).map((emotionType) =>

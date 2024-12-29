@@ -8,6 +8,7 @@ import { useState } from "react";
 type NoteType = {
   color: string;
   sketch: string;
+  emotion: string;
 };
 
 export type NotesType = {
@@ -15,6 +16,8 @@ export type NotesType = {
     [timestamp: string]: NoteType;
   };
 };
+
+const MAX_EMOTIONS = 2; //0-indexed
 
 // The calendar tab of the board
 function CalendarBoard({
@@ -30,6 +33,7 @@ function CalendarBoard({
 }) {
   const notes: NotesType = JSON.parse(localStorage.getItem("notes") || "{}");
   const [selectedTimestamp, setSelectedTimestamp] = useState(Date.now());
+  let maxIndex = 0;
 
   // Customize the calendar tiles to display a circle with color
   const tileContent = ({ date, view }: { date: Date; view: string }) => {
@@ -38,22 +42,29 @@ function CalendarBoard({
       if (notes[dateKey]) {
         return (
           <div className={styles.note__indicators}>
-            {Object.entries(notes[dateKey]).map(([timestamp, note], index) => (
-              <svg
-                viewBox="0 0 20 20"
-                xmlns="http://www.w3.org/2000/svg"
-                key={`${dateKey}-${index}`}
-                style={{
-                  left: `${index * 26}px`,
-                }}
-                onClick={() => {
-                  handleEdit(note.color);
-                  setSelectedTimestamp(Number(timestamp));
-                }}
-              >
-                <circle cx="10" cy="10" r="10" fill={note.color} />
-              </svg>
-            ))}
+            {Object.entries(notes[dateKey]).map(([timestamp, note], index) => {
+              maxIndex = index;
+              return index > MAX_EMOTIONS ? null : (
+                <span
+                  key={`${dateKey}-${index}`}
+                  style={{
+                    backgroundColor: note.color,
+                  }}
+                  className={styles.note__indicator}
+                  onClick={() => {
+                    handleEdit(note.color);
+                    setSelectedTimestamp(Number(timestamp));
+                  }}
+                >
+                  {note.emotion}
+                </span>
+              );
+            })}
+            {maxIndex > MAX_EMOTIONS && (
+              <span className={`${styles.note__indicator} ${styles.more}`}>
+                +{maxIndex - MAX_EMOTIONS}
+              </span>
+            )}
           </div>
         );
       }

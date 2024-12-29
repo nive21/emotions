@@ -60,6 +60,7 @@ function Sketchpad({
             selectedColor,
             timestamp,
             save,
+            onClose,
           }}
         />
       ) : (

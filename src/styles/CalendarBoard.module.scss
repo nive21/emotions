@@ -1,3 +1,5 @@
+@use "./colors";
+
 .calendar__container {
   width: 100%;
   height: 100%;
@@ -6,13 +8,23 @@
 
 .note__indicators {
   position: relative;
-  width: 100%;
+  width: 80%;
   left: 30px;
   top: 6px;
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  gap: 8px;
 
-  svg {
-    position: absolute;
-    width: 20px;
+  .note__indicator {
     cursor: pointer;
+    height: 1.2rem;
+    padding: 0.2rem;
+    border-radius: 2px;
+  }
+
+  .more {
+    cursor: default;
+    background-color: colors.$cream;
   }
 }

@@ -20,6 +20,7 @@ function DrawingCanvas({
   selectedColor,
   timestamp,
   save,
+  onClose,
 }: {
   emotion: string;
   selectedTool: ToolsType;
@@ -27,30 +28,35 @@ function DrawingCanvas({
   selectedColor: string;
   timestamp: number;
   save: boolean;
+  onClose: () => void;
 }) {
   return (
-    <div className={styles.sketchpad__content}>
-      <SketchpadTools
-        {...{
-          tools: TOOLS_1,
-          selectedTool,
-          setSelectedTool,
-        }}
-      />
-      <SketchpadNote
-        emotion={emotion}
-        color={selectedColor}
-        tool={selectedTool}
-        timestamp={timestamp}
-        save={save}
-      />
-      <SketchpadTools
-        {...{
-          tools: TOOLS_2,
-          selectedTool,
-          setSelectedTool,
-        }}
-      />
+    <div className={styles.sketchpad}>
+      <h2 className={styles.title}>Sketch how you feel.</h2>
+      <div className={styles.sketchpad__content}>
+        <SketchpadTools
+          {...{
+            tools: TOOLS_1,
+            selectedTool,
+            setSelectedTool,
+          }}
+        />
+        <SketchpadNote
+          emotion={emotion}
+          color={selectedColor}
+          tool={selectedTool}
+          timestamp={timestamp}
+          save={save}
+          onClose={onClose}
+        />
+        <SketchpadTools
+          {...{
+            tools: TOOLS_2,
+            selectedTool,
+            setSelectedTool,
+          }}
+        />
+      </div>
     </div>
   );
 }

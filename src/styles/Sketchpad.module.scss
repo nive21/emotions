@@ -23,77 +23,95 @@
     cursor: pointer;
   }
 
-  .sketchpad__content {
+  .sketchpad {
     display: flex;
-    gap: 42px;
-    height: 340px;
+    flex-direction: column;
+    justify-content: center;
 
-    .sketchpad__tools {
+    .sketchpad__content {
       display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      width: 100px;
+      gap: 42px;
+      height: 340px;
 
-      div {
+      .sketchpad__tools {
         display: flex;
         flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        gap: 4px;
-        @extend %base-text;
-        color: colors.$cream;
-        font-weight: 200;
+        justify-content: space-between;
+        width: 100px;
 
-        button {
-          width: 64px;
-          height: 64px;
-          background-color: colors.$cream;
-          border-radius: 50%;
+        div {
           display: flex;
+          flex-direction: column;
           justify-content: center;
           align-items: center;
+          gap: 4px;
+          @extend %base-text;
+          color: colors.$cream;
+          font-weight: 200;
 
-          img {
-            width: 48px;
-            height: 48px;
+          button {
+            width: 64px;
+            height: 64px;
+            background-color: colors.$cream;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            img {
+              width: 48px;
+              height: 48px;
+            }
+          }
+
+          button:last-child {
+            background: none;
+            border: 3px solid colors.$orange;
+          }
+
+          .active {
+            background-color: colors.$cream !important;
           }
         }
+      }
 
-        button:last-child {
-          background: none;
-          border: 3px solid colors.$orange;
+      .sketchpad__note {
+        position: relative;
+        width: 360px;
+
+        canvas:first-child {
+          box-shadow: -6px 6px rgba(0, 0, 0, 0.2);
+          position: absolute;
         }
 
-        .active {
-          background-color: colors.$cream !important;
+        .save {
+          @extend %key-text;
+          font-size: 1.2rem;
+          z-index: 5;
+          position: relative;
+          top: 100%;
+          left: calc(100% - 9rem);
+          text-align: right;
+          margin: 20px 0;
+          color: colors.$cream;
         }
       }
-    }
 
-    .sketchpad__note {
-      position: relative;
-      width: 360px;
+      .sketchpad__save {
+        @extend %base-text;
+        position: relative;
+        left: 290px;
+        top: 300px;
+        cursor: pointer;
+        color: colors.$black;
+        background-color: colors.$cream;
+        padding: 4px 8px;
+        border-radius: 2px;
 
-      canvas:first-child {
-        box-shadow: -6px 6px rgba(0, 0, 0, 0.2);
-        position: absolute;
-      }
-    }
-
-    .sketchpad__save {
-      @extend %base-text;
-      position: relative;
-      left: 290px;
-      top: 300px;
-      cursor: pointer;
-      color: colors.$black;
-      background-color: colors.$cream;
-      padding: 4px 8px;
-      border-radius: 2px;
-
-      &:hover {
-        color: #000000;
-        background-color: colors.$white;
+        &:hover {
+          color: #000000;
+          background-color: colors.$white;
+        }
       }
     }
   }
@@ -157,12 +175,6 @@
   flex-direction: column;
   align-items: center;
 
-  h2 {
-    @extend %base-text;
-    color: colors.$cream;
-    margin-bottom: 24px;
-  }
-
   :global(.pannable) {
     width: calc(75vw + 46px);
     margin: 12px 24px;
@@ -218,4 +230,11 @@
       cursor: not-allowed;
     }
   }
+}
+
+h2.title {
+  @extend %base-text;
+  color: colors.$cream;
+  margin-bottom: 24px;
+  text-align: center;
 }
