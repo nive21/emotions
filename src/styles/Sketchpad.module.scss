@@ -164,7 +164,7 @@
   }
 
   :global(.pannable) {
-    width: 75vw;
+    width: calc(75vw + 46px);
     margin: 12px 24px;
     background-color: colors.$cream;
     border-radius: 12px;
@@ -177,10 +177,10 @@
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    margin: 24px 0;
+    margin: 40px 0;
 
     button {
-      margin: 24px;
+      margin: 36px;
       font-family: "Borel", serif;
       font-size: 1.2rem;
       letter-spacing: 0;
@@ -188,10 +188,34 @@
       text-transform: capitalize;
       text-align: center;
       cursor: pointer;
+      position: relative;
+      display: inline-block;
+
+      .emotion_tooltip {
+        @extend %base-text;
+        visibility: hidden;
+        z-index: 999;
+        background-color: colors.$cream;
+        padding: 4px 2px;
+        position: absolute;
+        border-radius: 6px;
+        top: 32px;
+        width: 160px;
+        left: -40px;
+      }
 
       &:hover {
         text-decoration: underline;
+
+        .emotion_tooltip {
+          visibility: visible;
+        }
       }
+    }
+
+    .disabled {
+      color: colors.$grey;
+      cursor: not-allowed;
     }
   }
 }

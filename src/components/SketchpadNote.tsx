@@ -163,7 +163,7 @@ function SketchpadNote({
           storedImage = p.loadImage(
             currentNotes[date][timestamp].sketch,
             () => {
-              console.log("Image loaded");
+              console.info("Image loaded");
             },
             (error) => {
               console.error("Error loading image", error);
