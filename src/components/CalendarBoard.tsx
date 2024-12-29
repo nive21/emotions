@@ -69,6 +69,7 @@ function CalendarBoard({
           onClose={handleClose}
           selectedColor={selectedColor}
           timestamp={selectedTimestamp}
+          emotionSelected={true}
         />
       )}
       <div className={styles.calendar__container}>
