@@ -151,3 +151,47 @@
   background-color: #000000c6;
   z-index: 4;
 }
+
+.emotion__container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  h2 {
+    @extend %base-text;
+    color: colors.$cream;
+    margin-bottom: 24px;
+  }
+
+  :global(.pannable) {
+    width: 75vw;
+    margin: 12px 24px;
+    background-color: colors.$cream;
+    border-radius: 12px;
+    cursor: default;
+  }
+
+  .emotion__list {
+    width: 75vw;
+    height: calc(100vh - 300px);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin: 24px 0;
+
+    button {
+      margin: 24px;
+      font-family: "Borel", serif;
+      font-size: 1.2rem;
+      letter-spacing: 0;
+      color: colors.$black;
+      text-transform: capitalize;
+      text-align: center;
+      cursor: pointer;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+}

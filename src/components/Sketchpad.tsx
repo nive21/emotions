@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import p5 from "p5";
+import Pannable from "webrix/components/Pannable";
 
 import styles from "../styles/Sketchpad.module.scss";
 import clearIcon from "../assets/sketch-icons/clear.svg";
@@ -9,6 +10,7 @@ import crayonIcon from "../assets/sketch-icons/crayon.svg";
 import typeIcon from "../assets/sketch-icons/type.svg";
 import downloadIcon from "../assets/sketch-icons/download.svg";
 import { NotesType } from "./CalendarBoard";
+import { EMOTIONS } from "../utils/emotionList";
 
 type ToolsType = keyof typeof ICONS;
 
@@ -41,6 +43,7 @@ function Sketchpad({
 }) {
   const [selectedTool, setSelectedTool] = useState<ToolsType>("Pen");
   const [save, setSave] = useState(false);
+  const [emotion, setEmotion] = useState("");
 
   const notes: NotesType = JSON.parse(localStorage.getItem("notes") || "{}");
   const date = new Date(timestamp).toLocaleDateString();
@@ -70,33 +73,118 @@ function Sketchpad({
           }}
         />
       )}
-      <div className={styles.sketchpad__content}>
-        <SketchpadTools
+      {emotion ? (
+        <DrawingCanvas
           {...{
-            tools: TOOLS_1,
+            emotion,
             selectedTool,
             setSelectedTool,
+            selectedColor,
+            timestamp,
+            save,
           }}
         />
-        <SketchpadNote
-          color={selectedColor}
-          tool={selectedTool}
-          timestamp={timestamp}
-          save={save}
-        />
-        <SketchpadTools
+      ) : (
+        <EmotionPicker
           {...{
-            tools: TOOLS_2,
-            selectedTool,
-            setSelectedTool,
+            emotion,
+            setEmotion,
           }}
         />
-      </div>
+      )}
     </div>
   );
 }
 
 export default Sketchpad;
+
+type EmotionCount = Record<string, number>;
+const emotionsList: string[] = Object.values(EMOTIONS).reduce(
+  (
+    acc: string[],
+    emotion: {
+      soft: EmotionCount;
+      medium: EmotionCount;
+      intense: EmotionCount;
+    }
+  ) => [
+    ...acc,
+    ...Object.keys(emotion.soft),
+    ...Object.keys(emotion.medium),
+    ...Object.keys(emotion.intense),
+  ],
+  [] as string[]
+);
+
+function EmotionPicker({
+  emotion,
+  setEmotion,
+}: {
+  emotion: string;
+  setEmotion: (emotion: string) => void;
+}) {
+  // TODO: Currenly pannable is not used. Decide if you want a pannable pick area
+  return (
+    <div className={styles.emotion__container}>
+      <h2>How are you feeling?</h2>
+      <Pannable>
+        <div className={styles.emotion__list}>
+          {emotionsList.map((pickedEmotion, i) => (
+            <button
+              key={i}
+              className={emotion === pickedEmotion ? styles.active : ""}
+              onClick={() => setEmotion(pickedEmotion)}
+            >
+              {pickedEmotion}
+            </button>
+          ))}
+        </div>
+      </Pannable>
+    </div>
+  );
+}
+
+function DrawingCanvas({
+  emotion,
+  selectedTool,
+  setSelectedTool,
+  selectedColor,
+  timestamp,
+  save,
+}: {
+  emotion: string;
+  selectedTool: ToolsType;
+  setSelectedTool: (tool: ToolsType) => void;
+  selectedColor: string;
+  timestamp: number;
+  save: boolean;
+}) {
+  return (
+    <div className={styles.sketchpad__content}>
+      <SketchpadTools
+        {...{
+          tools: TOOLS_1,
+          selectedTool,
+          setSelectedTool,
+        }}
+      />
+      <SketchpadNote
+        emotion={emotion}
+        color={selectedColor}
+        tool={selectedTool}
+        timestamp={timestamp}
+        save={save}
+      />
+      <SketchpadTools
+        {...{
+          tools: TOOLS_2,
+          selectedTool,
+          setSelectedTool,
+        }}
+      />
+    </div>
+  );
+}
 
 // Delete confirmation modal
 function DeleteConfirmation({
@@ -130,11 +218,13 @@ type TextOption = {
 };
 
 function SketchpadNote({
+  emotion,
   color,
   tool,
   timestamp,
   save,
 }: {
+  emotion: string;
   color: string;
   tool: string;
   timestamp: number;
@@ -332,6 +422,11 @@ function SketchpadNote({
 
       // Draw the canvas
       p.draw = () => {
+        p.fill(0); // Set text color
+        p.strokeWeight(1);
+        p.textSize(TEXT_SIZE);
+        p.textFont("Borel");
+
         if (storedImage) {
           // Draw the stored image
           p.image(storedImage, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
@@ -340,6 +435,8 @@ function SketchpadNote({
         if (toolRef.current === "Clear") {
           p.clear();
           p.background(color);
+          renderEmotion(p);
+
           textOptions = [];
           storedImage = null;
           return;
@@ -348,11 +445,21 @@ function SketchpadNote({
         // Handle text input
         if (textOptions.length) {
           p.background(color); // Clear the canvas
-          p.strokeWeight(1);
           textOptions.forEach((textOption, index) => {
             renderTextAndCaret(p, textOption, index === textOptions.length - 1);
           });
         }
+
+        renderEmotion(p);
+        p.textAlign(p.LEFT);
+      };
+
+      // Render the emotion text
+      const renderEmotion = (p: p5) => {
+        const text = `I feel\n${emotion.toLowerCase()}`;
+        console.log(text);
+        p.textAlign(p.CENTER);
+        p.text(text, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2);
       };
 
       // Render text and caret
@@ -361,10 +468,6 @@ function SketchpadNote({
         textOption: TextOption,
         isLastText: boolean
       ) => {
-        p.fill(0); // Set text color
-        p.textSize(TEXT_SIZE);
-        p.textFont("Borel");
-
         const {
           textInput,
           textX,
