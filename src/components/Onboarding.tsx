@@ -1,4 +1,8 @@
 import styles from "../styles/Onboarding.module.scss";
+import heart from "../assets/onboarding-icons/heart.svg";
+import butterfly from "../assets/onboarding-icons/butterfly.svg";
+import cupcake from "../assets/onboarding-icons/cupcake.svg";
+import flower from "../assets/onboarding-icons/flower.svg";
 
 // The introduction onboarding screen
 export function OnboardingIntro({ onClick }: { onClick: () => void }) {
@@ -25,6 +29,7 @@ export function OnboardingOutro({ onClick }: { onClick: () => void }) {
           We have sticky notes, a wide range of emotional vocabulary and other
           supplies to help you record.
           <br />
+          <br />
           Please note that <span>each emotion has a limit</span> to challenge
           you to explore.
         </p>
@@ -47,6 +52,28 @@ function Onboarding({
 }) {
   return (
     <>
+      <div className={styles.onboarding}>
+        <img
+          src={heart}
+          alt="heart"
+          className={`${styles.heart} ${styles.doodle}`}
+        />
+        <img
+          src={butterfly}
+          alt="butterfly"
+          className={`${styles.butterfly} ${styles.doodle}`}
+        />
+        <img
+          src={cupcake}
+          alt="cupcake"
+          className={`${styles.cupcake} ${styles.doodle}`}
+        />
+        <img
+          src={flower}
+          alt="flower"
+          className={`${styles.flower} ${styles.doodle}`}
+        />
+      </div>
       <div className={styles.onboarding__container}>
         <h1 className={styles.description}>{description}</h1>
         <button onClick={onClick}>{buttonText}</button>

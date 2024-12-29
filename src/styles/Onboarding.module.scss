@@ -2,6 +2,8 @@
 
 .onboarding__container {
   width: 40%;
+  max-width: 800px;
+  padding: 20px;
   text-align: center;
   display: flex;
   flex-direction: column;
@@ -31,4 +33,32 @@
   letter-spacing: 0.1rem;
   position: absolute;
   bottom: 24px;
+}
+
+.onboarding {
+  position: relative;
+
+  .doodle {
+    position: absolute;
+  }
+}
+
+.heart {
+  left: -24rem;
+  top: -4rem;
+}
+
+.butterfly {
+  right: -24rem;
+  top: -6rem;
+}
+
+.flower {
+  left: -28rem;
+  bottom: -14rem;
+}
+
+.cupcake {
+  right: -26rem;
+  bottom: -12rem;
 }

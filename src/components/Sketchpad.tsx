@@ -85,15 +85,15 @@ function DeleteConfirmation({
 }) {
   return (
     <>
-      <div className={styles.delete__confirmation}>
+      <div className={styles.confirmation__popup}>
         <h2>Are you sure?</h2>
         <p>Are you sure you want to delete this note?</p>
-        <div className={styles.delete__buttons}>
+        <div className={styles.buttons}>
           <button onClick={() => onDelete(true)}>Delete</button>
           <button onClick={() => onDelete(false)}>Cancel</button>
         </div>
       </div>
-      <div className={styles.delete__overlay}></div>
+      <div className={styles.popup__overlay}></div>
     </>
   );
 }
