@@ -1,6 +1,7 @@
 import { EMOTIONS } from "../utils/emotionList";
 import Pannable from "webrix/components/Pannable";
-import styles from "../styles/Sketchpad.module.scss";
+import styles from "../styles/EmotionPicker.module.scss";
+import popupstyles from "../styles/Popup.module.scss";
 import { useState } from "react";
 
 type EmotionTypeType = keyof typeof EMOTIONS;
@@ -120,19 +121,19 @@ function ResetConfirmation({
 }) {
   return (
     <>
-      <div className={styles.confirmation__popup}>
+      <div className={popupstyles.confirmation__popup}>
         <h2>Are you sure?</h2>
         <p>
           While a reset gives you freedom, staying within limits can push you to
           expand your emotional vocabulary — an important step toward greater
           self-awareness.
         </p>
-        <div className={styles.buttons}>
+        <div className={popupstyles.buttons}>
           <button onClick={() => onReset(true)}>Reset</button>
           <button onClick={() => onReset(false)}>Cancel</button>
         </div>
       </div>
-      <div className={styles.popup__overlay}></div>
+      <div className={popupstyles.popup__overlay}></div>
     </>
   );
 }

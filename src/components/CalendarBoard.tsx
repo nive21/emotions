@@ -33,7 +33,19 @@ function CalendarBoard({
 }) {
   const notes: NotesType = JSON.parse(localStorage.getItem("notes") || "{}");
   const [selectedTimestamp, setSelectedTimestamp] = useState(Date.now());
+  const [isNoteSelected, setIsNoteSelected] = useState(false);
   let maxIndex = 0;
+
+  const getTimestamp = (date: Date) => {
+    return new Date(
+      date.getFullYear(),
+      date.getMonth(),
+      date.getDate(),
+      0,
+      0,
+      0
+    ).getTime();
+  };
 
   // Customize the calendar tiles to display a circle with color
   const tileContent = ({ date, view }: { date: Date; view: string }) => {
@@ -44,6 +56,7 @@ function CalendarBoard({
           <div className={styles.note__indicators}>
             {Object.entries(notes[dateKey]).map(([timestamp, note], index) => {
               maxIndex = index;
+
               return index > MAX_EMOTIONS ? null : (
                 <span
                   key={`${dateKey}-${index}`}
@@ -52,8 +65,11 @@ function CalendarBoard({
                   }}
                   className={styles.note__indicator}
                   onClick={() => {
-                    handleEdit(note.color);
                     setSelectedTimestamp(Number(timestamp));
+                    handleEdit(note.color);
+                    setTimeout(() => {
+                      setIsNoteSelected(true);
+                    }, 0);
                   }}
                 >
                   {note.emotion}
@@ -61,7 +77,16 @@ function CalendarBoard({
               );
             })}
             {maxIndex > MAX_EMOTIONS && (
-              <span className={`${styles.note__indicator} ${styles.more}`}>
+              <span
+                className={`${styles.note__indicator} ${styles.more}`}
+                onClick={() => {
+                  const timestamp = getTimestamp(date);
+                  setSelectedTimestamp(Number(timestamp));
+                  setTimeout(() => {
+                    setIsNoteSelected(true);
+                  }, 0);
+                }}
+              >
                 +{maxIndex - MAX_EMOTIONS}
               </span>
             )}
@@ -81,10 +106,28 @@ function CalendarBoard({
           selectedColor={selectedColor}
           timestamp={selectedTimestamp}
           emotionSelected={true}
+          isNoteSelected={isNoteSelected}
         />
       )}
       <div className={styles.calendar__container}>
-        <Calendar maxDate={new Date()} tileContent={tileContent} />
+        <Calendar
+          maxDate={new Date()}
+          tileContent={tileContent}
+          tileClassName={({ date, view }) => {
+            if (
+              date.toDateString() === new Date().toDateString() &&
+              view === "month"
+            ) {
+              return "react-calendar__tile--today";
+            }
+          }}
+          onClickDay={(date) => {
+            const timestamp = getTimestamp(date);
+            setSelectedTimestamp(timestamp);
+            setIsNoteSelected(false);
+            handleEdit(selectedColor);
+          }}
+        />
       </div>
     </>
   );

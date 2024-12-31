@@ -73,12 +73,14 @@
           justify-content: space-between;
 
           button {
-            cursor: default;
-
             abbr {
               position: relative;
               top: 12px;
               left: 20px;
+            }
+
+            &:hover {
+              background-color: colors.$cream;
             }
           }
 
@@ -99,4 +101,15 @@
       }
     }
   }
+}
+
+.react-calendar__tile--today abbr {
+  font-weight: bold;
+  color: colors.$orange !important;
+  text-decoration: underline;
+}
+
+.react-calendar__tile--selected {
+  background-color: colors.$orange;
+  color: colors.$cream;
 }

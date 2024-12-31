@@ -1,0 +1,55 @@
+@use "./colors";
+@use "./fonts";
+
+.confirmation__popup {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  background-color: colors.$cream;
+  z-index: 5;
+  padding: 36px 48px;
+  border-radius: 12px;
+  width: 360px;
+
+  h2 {
+    color: colors.$orange;
+  }
+
+  p {
+    @extend %base-text;
+    color: colors.$black;
+  }
+
+  .buttons {
+    width: 100%;
+    margin-top: 48px;
+    display: flex;
+    justify-content: space-between;
+
+    button {
+      text-decoration: underline;
+      color: colors.$black;
+    }
+  }
+
+  .buttons button:first-child {
+    color: colors.$orange;
+  }
+
+  button:hover {
+    text-decoration: none;
+  }
+}
+
+.popup__overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #000000c6;
+  z-index: 4;
+}

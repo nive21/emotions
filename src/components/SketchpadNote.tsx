@@ -265,7 +265,6 @@ function SketchpadNote({
       // Render the emotion text
       const renderEmotion = (p: p5) => {
         const text = `I feel\n${pickedEmotion.toLowerCase()}`;
-        console.log(text);
         p.textAlign(p.CENTER);
         p.text(text, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2);
       };

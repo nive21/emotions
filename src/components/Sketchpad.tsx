@@ -3,6 +3,7 @@ import { NotesType } from "./CalendarBoard";
 import EmotionPicker from "./EmotionPicker";
 
 import styles from "../styles/Sketchpad.module.scss";
+import popupstyles from "../styles/Popup.module.scss";
 import { TOOL_NAMES, ToolsType } from "../utils/const";
 import DrawingCanvas from "./DrawingCanvas";
 
@@ -11,11 +12,13 @@ function Sketchpad({
   selectedColor,
   timestamp,
   emotionSelected = false,
+  isNoteSelected = true,
 }: {
   onClose: () => void;
   selectedColor: string;
   timestamp: number;
   emotionSelected?: boolean;
+  isNoteSelected?: boolean;
 }) {
   const [selectedTool, setSelectedTool] = useState<ToolsType>(TOOL_NAMES.Pen);
   const [save, setSave] = useState(false);
@@ -51,7 +54,7 @@ function Sketchpad({
           }}
         />
       )}
-      {emotion || emotionSelected ? (
+      {emotion || emotionSelected || !isNoteSelected ? (
         <DrawingCanvas
           {...{
             emotion,
@@ -61,6 +64,7 @@ function Sketchpad({
             timestamp,
             save,
             onClose,
+            isNoteSelected,
           }}
         />
       ) : (
@@ -85,15 +89,15 @@ function DeleteConfirmation({
 }) {
   return (
     <>
-      <div className={styles.confirmation__popup}>
+      <div className={popupstyles.confirmation__popup}>
         <h2>Are you sure?</h2>
         <p>Are you sure you want to delete this note?</p>
-        <div className={styles.buttons}>
+        <div className={popupstyles.buttons}>
           <button onClick={() => onDelete(true)}>Delete</button>
           <button onClick={() => onDelete(false)}>Cancel</button>
         </div>
       </div>
-      <div className={styles.popup__overlay}></div>
+      <div className={popupstyles.popup__overlay}></div>
     </>
   );
 }
