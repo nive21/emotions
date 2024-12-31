@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { NotesType } from "./CalendarBoard";
 import EmotionPicker from "./EmotionPicker";
 
@@ -11,21 +11,28 @@ function Sketchpad({
   onClose,
   selectedColor,
   timestamp,
-  emotionSelected = false,
-  isNoteSelected = true,
+  fromCalendar = false,
 }: {
   onClose: () => void;
-  selectedColor: string;
+  selectedColor?: string;
   timestamp: number;
-  emotionSelected?: boolean;
-  isNoteSelected?: boolean;
+  fromCalendar?: boolean;
 }) {
   const [selectedTool, setSelectedTool] = useState<ToolsType>(TOOL_NAMES.Pen);
   const [save, setSave] = useState(false);
-  const [emotion, setEmotion] = useState("");
 
   const notes: NotesType = JSON.parse(localStorage.getItem("notes") || "{}");
+  const [emotion, setEmotion] = useState("");
+
   const date = new Date(timestamp).toLocaleDateString();
+  //   If emotion is not available in localStorage, use the emotion prop
+  const pickedEmotion = notes[date]?.[timestamp]?.emotion;
+
+  useEffect(() => {
+    if (pickedEmotion) {
+      setEmotion(pickedEmotion);
+    }
+  }, [pickedEmotion]);
 
   return (
     <div className={styles.sketchpad__container}>
@@ -54,7 +61,7 @@ function Sketchpad({
           }}
         />
       )}
-      {emotion || emotionSelected || !isNoteSelected ? (
+      {emotion || !selectedColor ? (
         <DrawingCanvas
           {...{
             emotion,
@@ -64,7 +71,7 @@ function Sketchpad({
             timestamp,
             save,
             onClose,
-            isNoteSelected,
+            fromCalendar,
           }}
         />
       ) : (
@@ -72,6 +79,8 @@ function Sketchpad({
           {...{
             emotion,
             setEmotion,
+            fromCalendar,
+            timestamp,
           }}
         />
       )}

@@ -85,13 +85,13 @@ function Onboarding({
 
 export function Footer() {
   return (
-    <p className={styles.footer}>
+    <div className={styles.footer}>
       <p className={styles.desktopMessage}>
         Please view this app on a desktop for a better experience.
       </p>
       <p>
         Made with ♡ by <a href="https://www.linkedin.com/in/nivemathan/">NK</a>
       </p>
-    </p>
+    </div>
   );
 }

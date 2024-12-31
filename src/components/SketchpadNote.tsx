@@ -37,8 +37,6 @@ function SketchpadNote({
 }) {
   const notes: NotesType = JSON.parse(localStorage.getItem("notes") || "{}");
   const date = new Date(timestamp).toLocaleDateString();
-  //   If emotion is not available in localStorage, use the emotion prop
-  const pickedEmotion = notes[date]?.[timestamp]?.emotion || emotion;
 
   const sketchRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLDivElement>(null);
@@ -88,7 +86,7 @@ function SketchpadNote({
             // Update the notes object
             notes[date][timestamp] = {
               sketch: imageData,
-              emotion: pickedEmotion,
+              emotion: emotion,
               color,
             };
             localStorage.setItem("notes", JSON.stringify(notes));
@@ -96,7 +94,7 @@ function SketchpadNote({
         }
       }
     },
-    [timestamp, notes, date, pickedEmotion, color]
+    [timestamp, notes, date, emotion, color]
   );
 
   useEffect(() => {
@@ -264,7 +262,7 @@ function SketchpadNote({
 
       // Render the emotion text
       const renderEmotion = (p: p5) => {
-        const text = `I feel\n${pickedEmotion.toLowerCase()}`;
+        const text = `I feel\n${emotion.toLowerCase()}`;
         p.textAlign(p.CENTER);
         p.text(text, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2);
       };
@@ -323,7 +321,7 @@ function SketchpadNote({
       p5Instance.remove();
       p5Instance2.remove();
     };
-  }, [color, date, timestamp, pickedEmotion]);
+  }, [color, date, timestamp, emotion]);
 
   useEffect(() => {
     if (save) {

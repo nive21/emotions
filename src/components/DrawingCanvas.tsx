@@ -26,50 +26,54 @@ function DrawingCanvas({
   timestamp,
   save,
   onClose,
-  isNoteSelected = true,
+  fromCalendar,
 }: {
   emotion: string;
   selectedTool: ToolsType;
   setSelectedTool: (tool: ToolsType) => void;
-  selectedColor: string;
+  selectedColor?: string;
   timestamp: number;
   save: boolean;
   onClose: () => void;
-  isNoteSelected?: boolean;
+  fromCalendar?: boolean;
 }) {
   const [selectedTimestamp, setSelectedTimestamp] = useState(timestamp);
 
   return (
     <div className={styles.sketchpad}>
-      {isNoteSelected && (
-        <div className={styles.sketchpad__with_title}>
-          <h2 className={styles.title}>Sketch how you feel.</h2>
-          <div className={styles.sketchpad__content}>
-            <SketchpadTools
-              {...{
-                tools: TOOLS_1,
-                selectedTool,
-                setSelectedTool,
-              }}
-            />
-            <SketchpadNote
-              emotion={emotion}
-              color={selectedColor}
-              tool={selectedTool}
-              timestamp={selectedTimestamp}
-              save={save}
-              onClose={onClose}
-            />
-            <SketchpadTools
-              {...{
-                tools: TOOLS_2,
-                selectedTool,
-                setSelectedTool,
-              }}
-            />
-          </div>
-        </div>
-      )}
+      <div className={styles.sketchpad__with_title}>
+        {selectedColor && (
+          <>
+            <h2 className={styles.title}>
+              {fromCalendar ? "Sketch how you felt." : "Sketch how you feel."}
+            </h2>
+            <div className={styles.sketchpad__content}>
+              <SketchpadTools
+                {...{
+                  tools: TOOLS_1,
+                  selectedTool,
+                  setSelectedTool,
+                }}
+              />
+              <SketchpadNote
+                emotion={emotion}
+                color={selectedColor}
+                tool={selectedTool}
+                timestamp={selectedTimestamp}
+                save={save}
+                onClose={onClose}
+              />
+              <SketchpadTools
+                {...{
+                  tools: TOOLS_2,
+                  selectedTool,
+                  setSelectedTool,
+                }}
+              />
+            </div>
+          </>
+        )}
+      </div>
       <Timeline {...{ selectedTimestamp, setSelectedTimestamp }} />
     </div>
   );

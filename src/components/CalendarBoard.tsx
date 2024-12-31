@@ -33,7 +33,6 @@ function CalendarBoard({
 }) {
   const notes: NotesType = JSON.parse(localStorage.getItem("notes") || "{}");
   const [selectedTimestamp, setSelectedTimestamp] = useState(Date.now());
-  const [isNoteSelected, setIsNoteSelected] = useState(false);
   let maxIndex = 0;
 
   const getTimestamp = (date: Date) => {
@@ -65,11 +64,10 @@ function CalendarBoard({
                   }}
                   className={styles.note__indicator}
                   onClick={() => {
-                    setSelectedTimestamp(Number(timestamp));
-                    handleEdit(note.color);
                     setTimeout(() => {
-                      setIsNoteSelected(true);
-                    }, 0);
+                      setSelectedTimestamp(Number(timestamp));
+                      handleEdit(note.color);
+                    });
                   }}
                 >
                   {note.emotion}
@@ -82,9 +80,6 @@ function CalendarBoard({
                 onClick={() => {
                   const timestamp = getTimestamp(date);
                   setSelectedTimestamp(Number(timestamp));
-                  setTimeout(() => {
-                    setIsNoteSelected(true);
-                  }, 0);
                 }}
               >
                 +{maxIndex - MAX_EMOTIONS}
@@ -105,13 +100,17 @@ function CalendarBoard({
           onClose={handleClose}
           selectedColor={selectedColor}
           timestamp={selectedTimestamp}
-          emotionSelected={true}
-          isNoteSelected={isNoteSelected}
+          fromCalendar={true}
         />
       )}
       <div className={styles.calendar__container}>
         <Calendar
           maxDate={new Date()}
+          onClickDay={(date) => {
+            const timestamp = getTimestamp(date);
+            setSelectedTimestamp(timestamp);
+            handleEdit(selectedColor);
+          }}
           tileContent={tileContent}
           tileClassName={({ date, view }) => {
             if (
@@ -120,12 +119,6 @@ function CalendarBoard({
             ) {
               return "react-calendar__tile--today";
             }
-          }}
-          onClickDay={(date) => {
-            const timestamp = getTimestamp(date);
-            setSelectedTimestamp(timestamp);
-            setIsNoteSelected(false);
-            handleEdit(selectedColor);
           }}
         />
       </div>

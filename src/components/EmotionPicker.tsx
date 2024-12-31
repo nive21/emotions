@@ -11,9 +11,13 @@ const resetEmotions = () => {
 function EmotionPicker({
   emotion,
   setEmotion,
+  fromCalendar,
+  timestamp,
 }: {
   emotion: string;
   setEmotion: (emotion: string) => void;
+  fromCalendar?: boolean;
+  timestamp?: number;
 }) {
   // Stores the count remaining for each emotion
   const emotionsCountUserFile = localStorage.getItem("emotions");
@@ -53,7 +57,16 @@ function EmotionPicker({
           Reset Emotions
         </button>
         <div className={styles.emotion__container}>
-          <h2 className={styles.title}>How are you feeling?</h2>
+          <h2 className={styles.title}>
+            {fromCalendar
+              ? `How were you feeeling on ${new Date(
+                  timestamp!
+                ).toLocaleDateString("en-US", {
+                  month: "short",
+                  day: "numeric",
+                })}?`
+              : "How are you feeling?"}
+          </h2>
           <FilterOptions
             {...{
               selectedCategory,
