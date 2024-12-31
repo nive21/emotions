@@ -28,11 +28,28 @@
 }
 
 .footer {
+  display: flex;
+  justify-content: space-between;
+  width: 100vw;
+  padding: 0 40px;
   color: colors.$grey;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   letter-spacing: 0.1rem;
   position: absolute;
-  bottom: 24px;
+  bottom: 16px;
+  gap: 48px;
+
+  .desktopMessage {
+    display: block;
+
+    @media (min-width: 820px) and (min-height: 700px) {
+      display: none;
+    }
+  }
+
+  p:last-child {
+    text-align: right;
+  }
 }
 
 .onboarding {

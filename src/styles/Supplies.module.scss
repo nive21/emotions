@@ -1,4 +1,5 @@
 @use "./colors";
+@use "./fonts";
 
 .colors__tab {
   display: flex;
@@ -14,27 +15,43 @@
   }
 }
 
-.supplies__container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 20px;
-  width: 100%;
-  height: 100%;
+.colors__container {
+  h2.title {
+    @extend %base-text;
+    color: colors.$grey;
+    text-wrap: nowrap;
+  }
 
-  .notes__row {
+  .all_colors {
     display: flex;
-    gap: 0px;
+    flex-direction: column;
+    align-items: center;
     width: 100%;
     height: 100%;
 
-    .note {
-      background-color: aqua;
-      transform: rotate(-0.4deg);
+    .notes__row {
+      display: flex;
+      gap: 0px;
       width: 100%;
       height: 100%;
-      box-shadow: -3px 4px rgba(0, 0, 0, 0.06);
-      cursor: pointer;
+
+      .note {
+        transform: rotate(-0.4deg);
+        width: 100%;
+        height: 100%;
+        box-shadow: -3px 4px rgba(0, 0, 0, 0.06);
+        cursor: pointer;
+      }
     }
   }
+}
+
+.colors__container {
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  width: 100%;
+  height: 100%;
+  gap: 12px;
+  padding: 20px;
 }

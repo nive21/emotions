@@ -21,8 +21,10 @@ function EmotionPicker({
     emotionsCountUserFile ? JSON.parse(emotionsCountUserFile) : EMOTIONS
   );
   const [showConfirmation, setShowConfirmation] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState("all");
-  const [selectedIntensity, setSelectedIntensity] = useState("all");
+  const [selectedCategory, setSelectedCategory] =
+    useState<keyof typeof categories>("all");
+  const [selectedIntensity, setSelectedIntensity] =
+    useState<keyof typeof intensities>("all");
   const [searchTerm, setSearchTerm] = useState("");
 
   if (!emotionsCountUser) {
@@ -116,6 +118,15 @@ function EmotionPicker({
               )}
             </div>
           </Pannable>
+          <p className={styles.source}>
+            Source of emotions:{" "}
+            <a
+              href="https://karlamclaren.com/emotional-vocabulary-page"
+              target="_blank"
+            >
+              Emotional Vocabulary
+            </a>
+          </p>
         </div>
       </div>
     </>
@@ -132,13 +143,16 @@ function FilterOptions({
   searchTerm,
   setSearchTerm,
 }: {
-  selectedCategory: string;
-  setSelectedCategory: (category: string) => void;
-  selectedIntensity: string;
-  setSelectedIntensity: (intensity: string) => void;
+  selectedCategory: keyof typeof categories;
+  setSelectedCategory: (category: keyof typeof categories) => void;
+  selectedIntensity: keyof typeof intensities;
+  setSelectedIntensity: (intensity: keyof typeof intensities) => void;
   searchTerm: string;
   setSearchTerm: (term: string) => void;
 }) {
+  const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
+  const [isIntensityDropdownOpen, setIsIntensityDropdownOpen] = useState(false);
+
   return (
     <div className={styles.filter_options_container}>
       <input
@@ -146,27 +160,60 @@ function FilterOptions({
         placeholder="Search emotions"
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
+        className={styles.search}
       />
-      <select
-        value={selectedCategory}
-        onChange={(e) => setSelectedCategory(e.target.value)}
-      >
-        {Object.entries(categories).map(([category, label], i) => (
-          <option key={i} value={category}>
-            {label}
-          </option>
-        ))}
-      </select>
-      <select
-        value={selectedIntensity}
-        onChange={(e) => setSelectedIntensity(e.target.value)}
-      >
-        {Object.entries(intensities).map(([intensity, label], i) => (
-          <option key={i} value={intensity}>
-            {label}
-          </option>
-        ))}
-      </select>
+      <ul className={styles.dropdownList}>
+        <li className={styles.dropdownItem}>
+          <button
+            className={styles.dropdownButton}
+            onClick={() => setIsCategoryDropdownOpen(!isCategoryDropdownOpen)}
+          >
+            {categories[selectedCategory] || "Select Category"}
+          </button>
+          {isCategoryDropdownOpen && (
+            <ul className={styles.dropdownMenu}>
+              {Object.entries(categories).map(([category, label], i) => (
+                <li
+                  key={i}
+                  className={styles.dropdownOption}
+                  onClick={() => {
+                    setSelectedCategory(category as keyof typeof categories);
+                    setIsCategoryDropdownOpen(false);
+                  }}
+                >
+                  {label}
+                </li>
+              ))}
+            </ul>
+          )}
+        </li>
+      </ul>
+      <ul className={styles.dropdownList}>
+        <li className={styles.dropdownItem}>
+          <button
+            className={styles.dropdownButton}
+            onClick={() => setIsIntensityDropdownOpen(!isIntensityDropdownOpen)}
+          >
+            {intensities[selectedIntensity] || "Select Intensity"}
+          </button>
+          {isIntensityDropdownOpen && (
+            <ul className={styles.dropdownMenu}>
+              {Object.entries(intensities).map(([intensity, label], i) => (
+                <li
+                  key={i}
+                  className={styles.dropdownOption}
+                  onClick={() => {
+                    setSelectedIntensity(intensity as keyof typeof intensities);
+                    setIsIntensityDropdownOpen(false);
+                  }}
+                >
+                  {label}
+                </li>
+              ))}
+            </ul>
+          )}
+        </li>
+      </ul>
     </div>
   );
 }

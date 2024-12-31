@@ -2,6 +2,7 @@ import { useState } from "react";
 import styles from "../styles/Board.module.scss";
 import Supplies from "./Supplies";
 import CalendarBoard from "./CalendarBoard";
+import { Footer } from "./Onboarding";
 
 // The board of emotions
 function Board({ onClick }: { onClick: () => void }) {
@@ -30,6 +31,7 @@ function Board({ onClick }: { onClick: () => void }) {
           />
         )}
       </div>
+      <Footer />
     </div>
   );
 }

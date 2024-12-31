@@ -78,9 +78,20 @@ function Onboarding({
         <h1 className={styles.description}>{description}</h1>
         <button onClick={onClick}>{buttonText}</button>
       </div>
-      <p className={styles.footer}>
+      <Footer />
+    </>
+  );
+}
+
+export function Footer() {
+  return (
+    <p className={styles.footer}>
+      <p className={styles.desktopMessage}>
+        Please view this app on a desktop for a better experience.
+      </p>
+      <p>
         Made with ♡ by <a href="https://www.linkedin.com/in/nivemathan/">NK</a>
       </p>
-    </>
+    </p>
   );
 }

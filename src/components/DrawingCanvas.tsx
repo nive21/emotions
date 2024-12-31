@@ -42,7 +42,7 @@ function DrawingCanvas({
   return (
     <div className={styles.sketchpad}>
       {isNoteSelected && (
-        <>
+        <div className={styles.sketchpad__with_title}>
           <h2 className={styles.title}>Sketch how you feel.</h2>
           <div className={styles.sketchpad__content}>
             <SketchpadTools
@@ -68,7 +68,7 @@ function DrawingCanvas({
               }}
             />
           </div>
-        </>
+        </div>
       )}
       <Timeline {...{ selectedTimestamp, setSelectedTimestamp }} />
     </div>

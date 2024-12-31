@@ -70,10 +70,13 @@ function ColorsTab({
 
 function AllNotes({ tab, onEdit }: { tab: number; onEdit: EditHandler }) {
   return (
-    <div className={styles.supplies__container}>
-      {Array.from({ length: COL }, (_, i) => (
-        <NotesRow hue={i * 10 + COLORS[tab].hue} key={i} onEdit={onEdit} />
-      ))}
+    <div className={styles.colors__container}>
+      <h2 className={styles.title}>Pick a color based on your emotion.</h2>
+      <div className={styles.all_colors}>
+        {Array.from({ length: COL }, (_, i) => (
+          <NotesRow hue={i * 10 + COLORS[tab].hue} key={i} onEdit={onEdit} />
+        ))}
+      </div>
     </div>
   );
 }
