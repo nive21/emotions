@@ -1,10 +1,8 @@
-import { EMOTIONS } from "../utils/emotionList";
+import { categories, EMOTIONS, intensities } from "../utils/emotionList";
 import Pannable from "webrix/components/Pannable";
 import styles from "../styles/EmotionPicker.module.scss";
 import popupstyles from "../styles/Popup.module.scss";
 import { useState } from "react";
-
-type EmotionTypeType = keyof typeof EMOTIONS;
 
 const resetEmotions = () => {
   localStorage.setItem("emotions", JSON.stringify(EMOTIONS));
@@ -23,6 +21,9 @@ function EmotionPicker({
     emotionsCountUserFile ? JSON.parse(emotionsCountUserFile) : EMOTIONS
   );
   const [showConfirmation, setShowConfirmation] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [selectedIntensity, setSelectedIntensity] = useState("all");
+  const [searchTerm, setSearchTerm] = useState("");
 
   if (!emotionsCountUser) {
     resetEmotions();
@@ -36,7 +37,7 @@ function EmotionPicker({
     setShowConfirmation(false);
   };
 
-  // TODO: Currenly pannable is not used. Decide if you want a pannable pick area
+  // TODO: Currently pannable is not used. Decide if you want a pannable pick area
   return (
     <>
       {showConfirmation && <ResetConfirmation onReset={handleResetClick} />}
@@ -51,57 +52,67 @@ function EmotionPicker({
         </button>
         <div className={styles.emotion__container}>
           <h2 className={styles.title}>How are you feeling?</h2>
+          <FilterOptions
+            {...{
+              selectedCategory,
+              setSelectedCategory,
+              selectedIntensity,
+              setSelectedIntensity,
+              searchTerm,
+              setSearchTerm,
+            }}
+          />
           <Pannable>
             <div className={styles.emotion__list}>
-              {Object.keys(EMOTIONS).map((emotionType) =>
-                Object.keys(EMOTIONS[emotionType as EmotionTypeType]).map(
-                  (intensity) =>
-                    Object.entries(
-                      EMOTIONS[emotionType as EmotionTypeType][
-                        intensity as keyof (typeof EMOTIONS)[EmotionTypeType]
-                      ]
-                    ).map(
-                      ([pickedEmotion, count]: [string, number], i: number) => {
-                        const emotionsOfIntensity =
-                          emotionsCountUser[emotionType][intensity];
-                        const userCount =
-                          emotionsOfIntensity[pickedEmotion] || 0;
+              {Object.entries(EMOTIONS).map(
+                ([pickedEmotion, { category, intensity, value }], i) => {
+                  if (
+                    (selectedCategory !== "all" &&
+                      selectedCategory !== category) ||
+                    (selectedIntensity !== "all" &&
+                      selectedIntensity !== intensity)
+                  ) {
+                    return null;
+                  }
 
-                        return (
-                          <button
-                            key={i}
-                            className={`${!userCount ? styles.disabled : ""} ${
-                              pickedEmotion === emotion ? styles.active : ""
-                            }`.trim()}
-                            onClick={() => {
-                              setEmotion(pickedEmotion);
+                  if (
+                    searchTerm &&
+                    !pickedEmotion
+                      .toLowerCase()
+                      .includes(searchTerm.toLowerCase())
+                  ) {
+                    return null;
+                  }
 
-                              if (userCount >= 0) {
-                                // Reduce the used count of the picked emotion by 1
-                                const updatedCount = JSON.stringify({
-                                  ...emotionsCountUser,
-                                  [emotionType]: {
-                                    ...emotionsCountUser[emotionType],
-                                    [intensity]: {
-                                      ...emotionsOfIntensity,
-                                      [pickedEmotion]: userCount - 1,
-                                    },
-                                  },
-                                });
-
-                                localStorage.setItem("emotions", updatedCount);
-                              }
-                            }}
-                          >
-                            <div className={styles.emotion_tooltip}>
-                              {userCount}/{count} available
-                            </div>
-                            {pickedEmotion}
-                          </button>
-                        );
-                      }
-                    )
-                )
+                  const userCount = emotionsCountUser[pickedEmotion].value || 0;
+                  return (
+                    <button
+                      key={i}
+                      className={`${!userCount ? styles.disabled : ""} ${
+                        pickedEmotion === emotion ? styles.active : ""
+                      }`.trim()}
+                      onClick={() => {
+                        setEmotion(pickedEmotion);
+                        if (userCount >= 0) {
+                          // Reduce the used count of the picked emotion by 1
+                          const updatedCount = JSON.stringify({
+                            ...emotionsCountUser,
+                            [pickedEmotion]: {
+                              ...emotionsCountUser[pickedEmotion],
+                              value: value - 1,
+                            },
+                          });
+                          localStorage.setItem("emotions", updatedCount);
+                        }
+                      }}
+                    >
+                      <div className={styles.emotion_tooltip}>
+                        {userCount}/{value} available
+                      </div>
+                      {pickedEmotion}
+                    </button>
+                  );
+                }
               )}
             </div>
           </Pannable>
@@ -112,6 +123,53 @@ function EmotionPicker({
 }
 
 export default EmotionPicker;
+
+function FilterOptions({
+  selectedCategory,
+  setSelectedCategory,
+  selectedIntensity,
+  setSelectedIntensity,
+  searchTerm,
+  setSearchTerm,
+}: {
+  selectedCategory: string;
+  setSelectedCategory: (category: string) => void;
+  selectedIntensity: string;
+  setSelectedIntensity: (intensity: string) => void;
+  searchTerm: string;
+  setSearchTerm: (term: string) => void;
+}) {
+  return (
+    <div className={styles.filter_options_container}>
+      <input
+        type="text"
+        placeholder="Search emotions"
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+      />
+      <select
+        value={selectedCategory}
+        onChange={(e) => setSelectedCategory(e.target.value)}
+      >
+        {Object.entries(categories).map(([category, label], i) => (
+          <option key={i} value={category}>
+            {label}
+          </option>
+        ))}
+      </select>
+      <select
+        value={selectedIntensity}
+        onChange={(e) => setSelectedIntensity(e.target.value)}
+      >
+        {Object.entries(intensities).map(([intensity, label], i) => (
+          <option key={i} value={intensity}>
+            {label}
+          </option>
+        ))}
+      </select>
+    </div>
+  );
+}
 
 // Reset confirmation modal
 function ResetConfirmation({

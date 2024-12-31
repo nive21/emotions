@@ -88,3 +88,8 @@ h2.title {
   margin-bottom: 24px;
   text-align: center;
 }
+
+.filter_options_container {
+  position: relative;
+  z-index: 10;
+}
