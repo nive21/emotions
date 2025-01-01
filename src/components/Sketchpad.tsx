@@ -9,7 +9,7 @@ import DrawingCanvas from "./DrawingCanvas";
 
 function Sketchpad({
   onClose,
-  selectedColor = `hsl(10, 74%, 93%)`,
+  selectedColor,
   timestamp,
   fromCalendar = false,
   setSelectedColor,
@@ -28,12 +28,19 @@ function Sketchpad({
   const date = new Date(timestamp).toLocaleDateString();
   //   If emotion is not available in localStorage, use the emotion prop
   const pickedEmotion = notes[date]?.[timestamp]?.emotion;
+  const pickedColor = notes[date]?.[timestamp]?.color;
 
   useEffect(() => {
     if (pickedEmotion) {
       setEmotion(pickedEmotion);
     }
   }, [pickedEmotion]);
+
+  useEffect(() => {
+    if (pickedColor) {
+      setSelectedColor(pickedColor);
+    }
+  }, [pickedColor, setSelectedColor]);
 
   return (
     <div className={styles.sketchpad__container}>

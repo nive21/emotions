@@ -55,11 +55,26 @@ function SketchpadNote({
         combinedCanvas.width = CANVAS_WIDTH;
         combinedCanvas.height = CANVAS_HEIGHT;
 
+        combinedCanvas.style.width = `${CANVAS_WIDTH}px`;
+        combinedCanvas.style.height = `${CANVAS_HEIGHT}px`;
+
         const context = combinedCanvas.getContext("2d");
         if (context) {
           // Draw the canvases
-          context.drawImage(textCanvas, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-          context.drawImage(sketchCanvas, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+          context.drawImage(
+            textCanvas,
+            0,
+            0,
+            combinedCanvas.width,
+            combinedCanvas.height
+          );
+          context.drawImage(
+            sketchCanvas,
+            0,
+            0,
+            combinedCanvas.width,
+            combinedCanvas.height
+          );
 
           if (toDownload) {
             // Create a link element to save the image
@@ -158,7 +173,7 @@ function SketchpadNote({
       // Setup function
       p.setup = () => {
         p.createCanvas(360, 340).parent(textRef.current!);
-        p.background(color);
+        p.clear();
 
         const currentNotes = notesRef.current;
 
@@ -168,6 +183,9 @@ function SketchpadNote({
             currentNotes[date][timestamp].sketch,
             () => {
               console.info("Image loaded");
+              if (storedImage) {
+                p.image(storedImage, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+              }
             },
             (error) => {
               console.error("Error loading image", error);
@@ -231,14 +249,8 @@ function SketchpadNote({
         p.textSize(TEXT_SIZE);
         p.textFont("Borel");
 
-        if (storedImage) {
-          // Draw the stored image
-          p.image(storedImage, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-        }
-
         if (toolRef.current === TOOL_NAMES.Clear) {
           p.clear();
-          p.background(color);
           renderEmotion(p);
 
           textOptions = [];
@@ -248,7 +260,7 @@ function SketchpadNote({
 
         // Handle text input
         if (textOptions.length) {
-          p.background(color); // Clear the canvas
+          p.clear(); // Clear the canvas
           textOptions.forEach((textOption, index) => {
             renderTextAndCaret(p, textOption, index === textOptions.length - 1);
           });
@@ -337,7 +349,12 @@ function SketchpadNote({
   }, [handleSave]);
 
   return (
-    <div className={styles.sketchpad__note}>
+    <div
+      className={styles.sketchpad__note}
+      style={{
+        backgroundColor: color,
+      }}
+    >
       <div ref={textRef} className={styles.text}></div>
       <div ref={sketchRef} className={styles.sketch}></div>
       <input

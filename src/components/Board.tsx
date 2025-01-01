@@ -9,8 +9,9 @@ import Sketchpad from "./Sketchpad";
 function Board({ onClick }: { onClick: () => void }) {
   const [tab, setTab] = useState(0);
   const [editMode, setEditMode] = useState(false);
-  const [selectedColor, setSelectedColor] = useState("");
+  const [selectedColor, setSelectedColor] = useState(`hsl(10, 74%, 93%)`);
   const [selectedTimestamp, setSelectedTimestamp] = useState(Date.now());
+  const [fromCalendar, setFromCalendar] = useState(false);
 
   const handleEdit = (color: string) => {
     setSelectedColor(color);
@@ -30,6 +31,7 @@ function Board({ onClick }: { onClick: () => void }) {
           selectedColor={selectedColor}
           timestamp={selectedTimestamp}
           setSelectedColor={setSelectedColor}
+          fromCalendar={fromCalendar}
         />
       )}
       <div className={styles.board__container}>
@@ -38,20 +40,18 @@ function Board({ onClick }: { onClick: () => void }) {
           {tab === 0 ? (
             <Supplies
               {...{
-                editMode,
-                selectedColor,
                 handleEdit,
-                handleClose,
+                setSelectedTimestamp,
+                setFromCalendar,
               }}
             />
           ) : (
             <CalendarBoard
               {...{
-                editMode,
                 selectedColor,
                 handleEdit,
-                handleClose,
                 setSelectedTimestamp,
+                setFromCalendar,
               }}
             />
           )}

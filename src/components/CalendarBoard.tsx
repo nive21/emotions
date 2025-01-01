@@ -22,10 +22,12 @@ function CalendarBoard({
   selectedColor,
   handleEdit,
   setSelectedTimestamp,
+  setFromCalendar,
 }: {
   selectedColor: string;
   handleEdit: EditHandler;
   setSelectedTimestamp: (timestamp: number) => void;
+  setFromCalendar: (fromCalendar: boolean) => void;
 }) {
   const notes: NotesType = JSON.parse(localStorage.getItem("notes") || "{}");
   let maxIndex = 0;
@@ -61,6 +63,7 @@ function CalendarBoard({
                   onClick={() => {
                     setTimeout(() => {
                       setSelectedTimestamp(Number(timestamp));
+                      setFromCalendar(true);
                       handleEdit(note.color);
                     });
                   }}
@@ -75,6 +78,7 @@ function CalendarBoard({
                 onClick={() => {
                   const timestamp = getTimestamp(date);
                   setSelectedTimestamp(Number(timestamp));
+                  setFromCalendar(true);
                 }}
               >
                 +{maxIndex - MAX_EMOTIONS}
@@ -96,6 +100,7 @@ function CalendarBoard({
           onClickDay={(date) => {
             const timestamp = getTimestamp(date);
             setSelectedTimestamp(timestamp);
+            setFromCalendar(true);
             handleEdit(selectedColor);
           }}
           tileContent={tileContent}

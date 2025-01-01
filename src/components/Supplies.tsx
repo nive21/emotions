@@ -13,13 +13,27 @@ const ROW = 10;
 export type EditHandler = (color: string) => void;
 
 // The supplies tab of the board
-function Supplies({ handleEdit }: { handleEdit: EditHandler }) {
+function Supplies({
+  handleEdit,
+  setSelectedTimestamp,
+  setFromCalendar,
+}: {
+  handleEdit: EditHandler;
+  setSelectedTimestamp: (timestamp: number) => void;
+  setFromCalendar: (fromCalendar: boolean) => void;
+}) {
   const [tab, setTab] = useState(0);
+
+  const handleColorPick = (color: string) => {
+    handleEdit(color);
+    setSelectedTimestamp(Date.now());
+    setFromCalendar(false);
+  };
 
   return (
     <>
       <ColorsTab {...{ tab, setTab }} />
-      <AllNotes {...{ tab, onEdit: handleEdit }} />
+      <AllNotes {...{ tab, onEdit: handleColorPick }} />
     </>
   );
 }

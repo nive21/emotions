@@ -155,6 +155,7 @@ function Timeline({
           style={{
             position: "absolute",
             left: `${leftPercentage}%`,
+            backgroundColor: note.color,
           }}
           onClick={() => setSelectedTimestamp(parseInt(timestamp))}
         >
