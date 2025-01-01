@@ -1,50 +1,24 @@
-# React + TypeScript + Vite
+# Emotion Tracker
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A personal project to visualize and track your emotions, inspired by Dr. Julie Smith's book _"Why Has Nobody Told Me This Before?"_ and the Emotion Wheel by [The Pudding](https://pudding.cool/2022/12/emotion-wheel/).
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Note and Sketch Your Emotions**: Add notes and sketches to your calendar to record how you feel each day.
+- **Calendar View**: See your emotional journey visually over time.
+- **Explore Emotions**: Explore new feelings with an extensive catalogue and easy-to-use filters.
 
-## Expanding the ESLint configuration
+## Technologies Used
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+- **React**
+- **TypeScript**
+- **p5.js** for sketches
+- **react-calendar** for the calendar view
 
-- Configure the top-level `parserOptions` property like this:
+## Live Demo
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+Try it out here: [https://emotions-two.vercel.app/](https://emotions-two.vercel.app/)
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+## Future Features
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
-
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
-```
+- **Emotion Analysis**: Track trends and get insights into your emotions over time.
