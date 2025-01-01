@@ -2,7 +2,7 @@ import p5 from "p5";
 import { useCallback, useEffect, useRef } from "react";
 import { NotesType } from "./CalendarBoard";
 import styles from "../styles/Sketchpad.module.scss";
-import { TOOL_NAMES } from "../utils/const";
+import { hexToHsl, hslToHex, TOOL_NAMES } from "../utils/const";
 
 const LINE_HEIGHT = 40; // Space between lines
 const TEXT_SIZE = 32; // Font size for text input
@@ -23,6 +23,7 @@ type TextOption = {
 function SketchpadNote({
   emotion,
   color,
+  setSelectedColor,
   tool,
   timestamp,
   save,
@@ -30,6 +31,7 @@ function SketchpadNote({
 }: {
   emotion: string;
   color: string;
+  setSelectedColor: (color: string) => void;
   tool: string;
   timestamp: number;
   save: boolean;
@@ -37,7 +39,6 @@ function SketchpadNote({
 }) {
   const notes: NotesType = JSON.parse(localStorage.getItem("notes") || "{}");
   const date = new Date(timestamp).toLocaleDateString();
-
   const sketchRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLDivElement>(null);
   const toolRef = useRef(tool);
@@ -339,6 +340,12 @@ function SketchpadNote({
     <div className={styles.sketchpad__note}>
       <div ref={textRef} className={styles.text}></div>
       <div ref={sketchRef} className={styles.sketch}></div>
+      <input
+        type="color"
+        value={hslToHex(color)}
+        onChange={(e) => setSelectedColor(hexToHsl(e.target.value))}
+        className={styles.color_picker}
+      />
       <button
         className={styles.save}
         onClick={() => {

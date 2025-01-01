@@ -23,6 +23,7 @@ function DrawingCanvas({
   selectedTool,
   setSelectedTool,
   selectedColor,
+  setSelectedColor,
   timestamp,
   save,
   onClose,
@@ -32,6 +33,7 @@ function DrawingCanvas({
   selectedTool: ToolsType;
   setSelectedTool: (tool: ToolsType) => void;
   selectedColor?: string;
+  setSelectedColor: (color: string) => void;
   timestamp: number;
   save: boolean;
   onClose: () => void;
@@ -58,6 +60,7 @@ function DrawingCanvas({
               <SketchpadNote
                 emotion={emotion}
                 color={selectedColor}
+                setSelectedColor={setSelectedColor}
                 tool={selectedTool}
                 timestamp={selectedTimestamp}
                 save={save}

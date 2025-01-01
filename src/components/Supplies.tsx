@@ -1,6 +1,5 @@
 import { useState } from "react";
 import styles from "../styles/Supplies.module.scss";
-import Sketchpad from "./Sketchpad";
 
 const COLORS = [
   { name: "Reds", hue: 0 },
@@ -14,28 +13,11 @@ const ROW = 10;
 export type EditHandler = (color: string) => void;
 
 // The supplies tab of the board
-function Supplies({
-  editMode,
-  selectedColor,
-  handleEdit,
-  handleClose,
-}: {
-  editMode: boolean;
-  selectedColor: string;
-  handleEdit: EditHandler;
-  handleClose: () => void;
-}) {
+function Supplies({ handleEdit }: { handleEdit: EditHandler }) {
   const [tab, setTab] = useState(0);
 
   return (
     <>
-      {editMode && (
-        <Sketchpad
-          onClose={handleClose}
-          selectedColor={selectedColor}
-          timestamp={Date.now()}
-        />
-      )}
       <ColorsTab {...{ tab, setTab }} />
       <AllNotes {...{ tab, onEdit: handleEdit }} />
     </>

@@ -9,18 +9,19 @@ import DrawingCanvas from "./DrawingCanvas";
 
 function Sketchpad({
   onClose,
-  selectedColor,
+  selectedColor = `hsl(10, 74%, 93%)`,
   timestamp,
   fromCalendar = false,
+  setSelectedColor,
 }: {
   onClose: () => void;
   selectedColor?: string;
   timestamp: number;
   fromCalendar?: boolean;
+  setSelectedColor: (color: string) => void;
 }) {
   const [selectedTool, setSelectedTool] = useState<ToolsType>(TOOL_NAMES.Pen);
   const [save, setSave] = useState(false);
-
   const notes: NotesType = JSON.parse(localStorage.getItem("notes") || "{}");
   const [emotion, setEmotion] = useState("");
 
@@ -61,13 +62,14 @@ function Sketchpad({
           }}
         />
       )}
-      {emotion || !selectedColor ? (
+      {emotion ? (
         <DrawingCanvas
           {...{
             emotion,
             selectedTool,
             setSelectedTool,
             selectedColor,
+            setSelectedColor,
             timestamp,
             save,
             onClose,

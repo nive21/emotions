@@ -3,12 +3,14 @@ import styles from "../styles/Board.module.scss";
 import Supplies from "./Supplies";
 import CalendarBoard from "./CalendarBoard";
 import { Footer } from "./Onboarding";
+import Sketchpad from "./Sketchpad";
 
 // The board of emotions
 function Board({ onClick }: { onClick: () => void }) {
   const [tab, setTab] = useState(0);
   const [editMode, setEditMode] = useState(false);
   const [selectedColor, setSelectedColor] = useState("");
+  const [selectedTimestamp, setSelectedTimestamp] = useState(Date.now());
 
   const handleEdit = (color: string) => {
     setSelectedColor(color);
@@ -21,26 +23,42 @@ function Board({ onClick }: { onClick: () => void }) {
   };
 
   return (
-    <div className={styles.board__container}>
-      <Navbar {...{ tab, setTab, onClick }} />
-      <div className={styles.content}>
-        {tab === 0 ? (
-          <Supplies
-            {...{
-              editMode,
-              selectedColor,
-              handleEdit,
-              handleClose,
-            }}
-          />
-        ) : (
-          <CalendarBoard
-            {...{ editMode, selectedColor, handleEdit, handleClose }}
-          />
-        )}
+    <>
+      {editMode && (
+        <Sketchpad
+          onClose={handleClose}
+          selectedColor={selectedColor}
+          timestamp={selectedTimestamp}
+          setSelectedColor={setSelectedColor}
+        />
+      )}
+      <div className={styles.board__container}>
+        <Navbar {...{ tab, setTab, onClick }} />
+        <div className={styles.content}>
+          {tab === 0 ? (
+            <Supplies
+              {...{
+                editMode,
+                selectedColor,
+                handleEdit,
+                handleClose,
+              }}
+            />
+          ) : (
+            <CalendarBoard
+              {...{
+                editMode,
+                selectedColor,
+                handleEdit,
+                handleClose,
+                setSelectedTimestamp,
+              }}
+            />
+          )}
+        </div>
+        <Footer />
       </div>
-      <Footer />
-    </div>
+    </>
   );
 }
 

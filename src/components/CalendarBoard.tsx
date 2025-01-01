@@ -1,9 +1,7 @@
 import Calendar from "react-calendar";
 import styles from "../styles/CalendarBoard.module.scss";
 import "../styles/CalendarBoard.scss";
-import Sketchpad from "./Sketchpad";
 import { EditHandler } from "./Supplies";
-import { useState } from "react";
 
 type NoteType = {
   color: string;
@@ -21,18 +19,15 @@ const MAX_EMOTIONS = 2; //0-indexed
 
 // The calendar tab of the board
 function CalendarBoard({
-  editMode,
   selectedColor,
   handleEdit,
-  handleClose,
+  setSelectedTimestamp,
 }: {
-  editMode: boolean;
   selectedColor: string;
   handleEdit: EditHandler;
-  handleClose: () => void;
+  setSelectedTimestamp: (timestamp: number) => void;
 }) {
   const notes: NotesType = JSON.parse(localStorage.getItem("notes") || "{}");
-  const [selectedTimestamp, setSelectedTimestamp] = useState(Date.now());
   let maxIndex = 0;
 
   const getTimestamp = (date: Date) => {
@@ -95,14 +90,6 @@ function CalendarBoard({
 
   return (
     <>
-      {editMode && (
-        <Sketchpad
-          onClose={handleClose}
-          selectedColor={selectedColor}
-          timestamp={selectedTimestamp}
-          fromCalendar={true}
-        />
-      )}
       <div className={styles.calendar__container}>
         <Calendar
           maxDate={new Date()}
