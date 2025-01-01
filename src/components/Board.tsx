@@ -17,6 +17,7 @@ function Board({ onClick }: { onClick: () => void }) {
 
   const handleClose = () => {
     setEditMode(false);
+    setTab(1);
   };
 
   return (
@@ -24,7 +25,14 @@ function Board({ onClick }: { onClick: () => void }) {
       <Navbar {...{ tab, setTab, onClick }} />
       <div className={styles.content}>
         {tab === 0 ? (
-          <Supplies {...{ editMode, selectedColor, handleEdit, handleClose }} />
+          <Supplies
+            {...{
+              editMode,
+              selectedColor,
+              handleEdit,
+              handleClose,
+            }}
+          />
         ) : (
           <CalendarBoard
             {...{ editMode, selectedColor, handleEdit, handleClose }}

@@ -192,38 +192,35 @@ function SketchpadNote({
       };
 
       p.keyPressed = () => {
-        if (toolRef.current === TOOL_NAMES.Type && textOptions.length > 0) {
-          const lastestText = textOptions?.at(-1) ?? {
-            textInput: "",
-            numNewLines: 0,
-            initialX: -1,
-            textX: -1,
-          };
-          let { textInput, numNewLines } = lastestText;
+        if (!(toolRef.current === TOOL_NAMES.Type && textOptions.length > 0))
+          return;
 
-          if (p.keyCode === p.BACKSPACE) {
-            if (textInput.endsWith("\n")) {
-              textInput = textInput.slice(0, -1); // Remove the newline character
+        const lastestText = textOptions[textOptions.length - 1];
+        if (!lastestText) return;
+
+        let { textInput, numNewLines } = lastestText;
+        if (p.keyCode === p.BACKSPACE) {
+          if (textInput.endsWith("\n")) {
+            textInput = textInput.slice(0, -1); // Remove the newline character
+            numNewLines--;
+          } else if (textInput === "") {
+            if (numNewLines > 0) {
               numNewLines--;
-            } else if (textInput === "") {
-              if (numNewLines > 0) {
-                numNewLines--;
-              }
-            } else {
-              // Remove the last character
-              textInput = textInput.slice(0, -1);
             }
-          } else if (p.keyCode === p.ENTER) {
-            textInput += "\n";
-            lastestText.textX = lastestText.initialX; // Move to initial X position
-            numNewLines++;
-          } else if (p.key.length === 1) {
-            textInput += p.key;
+          } else {
+            // Remove the last character
+            textInput = textInput.slice(0, -1);
           }
-
-          lastestText.textInput = textInput;
-          lastestText.numNewLines = numNewLines;
+        } else if (p.keyCode === p.ENTER) {
+          textInput += "\n";
+          lastestText.textX = lastestText.initialX; // Move to initial X position
+          numNewLines++;
+        } else if (p.key.length === 1) {
+          textInput += p.key;
         }
+
+        lastestText.textInput = textInput;
+        lastestText.numNewLines = numNewLines;
       };
 
       // Draw the canvas

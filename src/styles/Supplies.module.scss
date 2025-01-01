@@ -18,7 +18,8 @@
 .colors__container {
   h2.title {
     @extend %base-text;
-    color: colors.$grey;
+    color: colors.$orange;
+    font-weight: 600;
     text-wrap: nowrap;
   }
 
