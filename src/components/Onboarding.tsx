@@ -89,9 +89,7 @@ export function Footer() {
       <p className={styles.desktopMessage}>
         Please view this app on a desktop for a better experience.
       </p>
-      <p>
-        Made with ♡ by <a href="https://www.linkedin.com/in/nivemathan/">NK</a>
-      </p>
+      <p>Made with ♡ by NK</p>
     </div>
   );
 }
