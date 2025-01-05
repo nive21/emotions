@@ -2,6 +2,7 @@ import Calendar from "react-calendar";
 import styles from "../styles/CalendarBoard.module.scss";
 import "../styles/CalendarBoard.scss";
 import { EditHandler } from "./Supplies";
+import { addCalendarStyles } from "../utils/const";
 
 type NoteType = {
   color: string;
@@ -96,7 +97,6 @@ function CalendarBoard({
     <>
       <div className={styles.calendar__container}>
         <Calendar
-          maxDate={new Date()}
           onClickDay={(date) => {
             const timestamp = getTimestamp(date);
             setSelectedTimestamp(timestamp);
@@ -104,14 +104,8 @@ function CalendarBoard({
             handleEdit(selectedColor);
           }}
           tileContent={tileContent}
-          tileClassName={({ date, view }) => {
-            if (
-              date.toDateString() === new Date().toDateString() &&
-              view === "month"
-            ) {
-              return "react-calendar__tile--today";
-            }
-          }}
+          tileClassName={addCalendarStyles}
+          maxDate={new Date()}
         />
       </div>
     </>

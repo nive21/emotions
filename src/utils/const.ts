@@ -89,3 +89,21 @@ export function hexToHsl(hex: string): string {
     l * 100
   )}%)`;
 }
+
+export const addCalendarStyles = ({
+  date,
+  view,
+}: {
+  date: Date;
+  view: string;
+}) => {
+  const today = new Date();
+
+  if (date.toDateString() === today.toDateString() && view === "month") {
+    return "react-calendar__tile--today";
+  }
+  if (date > today && view === "month") {
+    return "react-calendar__tile--later";
+  }
+  return null;
+};

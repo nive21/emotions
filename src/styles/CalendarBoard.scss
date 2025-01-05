@@ -109,6 +109,14 @@
   text-decoration: underline;
 }
 
+.react-calendar__tile--later {
+  cursor: default;
+  pointer-events: none;
+  abbr {
+    color: colors.$grey;
+  }
+}
+
 .react-calendar__tile--selected {
   background-color: colors.$orange;
   color: colors.$cream;

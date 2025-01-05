@@ -1,6 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import styles from "../styles/Sketchpad.module.scss";
-import { ICONS, TOOL_NAMES, ToolsType } from "../utils/const";
+import {
+  addCalendarStyles,
+  ICONS,
+  TOOL_NAMES,
+  ToolsType,
+} from "../utils/const";
 import SketchpadNote from "./SketchpadNote";
 import { NotesType } from "./CalendarBoard";
 import next from "../assets/misc-icons/next.svg";
@@ -177,19 +182,16 @@ function Timeline({
             }}
             tileClassName={({ date, view }) => {
               if (
-                date.toDateString() === new Date().toDateString() &&
-                view === "month"
-              ) {
-                return "react-calendar__tile--today";
-              }
-
-              if (
                 date.toDateString() === new Date(currentDate).toDateString() &&
                 view === "month"
               ) {
                 return "react-calendar__tile--selected";
               }
-              return null;
+              const calendarStyle = addCalendarStyles({
+                date,
+                view,
+              });
+              return calendarStyle;
             }}
           />
         </div>
